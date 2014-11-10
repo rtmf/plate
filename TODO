@@ -1,0 +1,4 @@
+* actually pick and set up a build system, build.sh is dumb. - not in milestones
+
+* milestone 1 will be to init an sdl/ogl window and paint some portion of a tileset nabbed from the interwebs
+* milestone 2 will be defined asap.
