@@ -2,7 +2,8 @@
 #define __PLATE_H__
 #include "platecommon.h"
 #include "display.h"
-#include "oglconsole.h"
+//#include "oglconsole.h"
+//XXX not using this yet
 #include <iostream>
 namespace PLATE
 {
@@ -19,6 +20,7 @@ namespace PLATE
 			
 		private:
 			Display * d=NULL;
+			bool isRunning=true;
 	}
 }
 #endif //__PLATE_H__

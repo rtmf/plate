@@ -22,7 +22,7 @@ void Plate::fatalError(const char * context, const char * err)
 void Plate::main(int argc, char ** argv)
 {
 	//main event loop
-	while(true)
+	while(isRunning)
 	{
 		d->render();
 	}

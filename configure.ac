@@ -7,7 +7,7 @@ AC_HEADER_STDC
 dnl SDL Check roughly as wiki states
 
 SDL_VERSION=2.0.0
-AM_PATH_SDL($SDL_VERSION,
+AM_PATH_SDL2($SDL_VERSION,
 	:,
 	AC_MSG_ERROR([*** SDL Version $SDL_VERSION not found!])
 )
