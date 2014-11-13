@@ -1,6 +1,7 @@
 #include "display.h"
+#include "plate.h"
 using namespace PLATE;
-void Display::Display(Plate * p, int w, int h, const char * t)
+Display::Display(Plate * p, int w, int h, const char * t)
 {
 	SDL_RendererInfo rendererInfo;
 	plate=p;
@@ -9,11 +10,11 @@ void Display::Display(Plate * p, int w, int h, const char * t)
 	{
 		p->fatalSDLError("PLATE::Display::Display");
 	}
-	SDL_GetRendererInfo(rndr, &rendererInfo);
+	SDL_GetRendererInfo(rrr, &rendererInfo);
 	if ((rendererInfo.flags & SDL_RENDERER_ACCELERATED) == 0 ||
 			(rendererInfo.flags & SDL_RENDERER_TARGETTEXTURE) == 0)
 	{
-		p->fatalError("Could not set up accelerated render context / GL context");
+		p->fatalError("PLATE::Display::Display","Could not set up accelerated render context / GL context");
 	}
 	width=w;
 	height=h;
@@ -35,7 +36,7 @@ void Display::resetGL(void)
 }
 void Display::resizeGL(void)
 {
-	Glfloat ratio,w,h;
+	GLfloat ratio,w,h;
 
 	h=height;
 	w=width;
@@ -65,7 +66,7 @@ void Display::resize(int w, int h)
 	//XXX this is not finished
 	this->resizeGL();
 }
-void Display::setTitle(const char * t);
+void Display::setTitle(const char * t)
 {
 	SDL_SetWindowTitle(win,t);
 }
@@ -74,7 +75,7 @@ void Display::render(void)
 	this->clearGL();
 
 	glLoadIdentity();
-	glTranslate(-1.5f,0.0f,-6.0f);
+	glTranslatef(-1.5f,0.0f,-6.0f);
 
 	glBegin(GL_TRIANGLES);
 	{
@@ -97,7 +98,8 @@ void Display::render(void)
 
 	SDL_GL_SwapWindow(win);
 }
- void Display::~Display(void)
+
+Display::~Display(void)
 {
 	if (win)
 		SDL_DestroyWindow(win);

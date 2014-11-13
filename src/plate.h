@@ -1,7 +1,6 @@
 #ifndef __PLATE_H__
 #define __PLATE_H__
 #include "platecommon.h"
-#include "display.h"
 //#include "oglconsole.h"
 //XXX not using this yet
 #include <iostream>
@@ -10,17 +9,17 @@ namespace PLATE
 	class Plate
 	{
 		public:
-			void Plate(void);
+			Plate(void);
 
-			int main(int argc, char ** argv);
+			int run(int argc, char ** argv);
 			void fatalSDLError(const char * context);
-			void fatalError(const char * context);
+			void fatalError(const char * context,const char * err);
 
-			void ~Plate(void);
+			~Plate(void);
 			
 		private:
-			Display * d=NULL;
-			bool isRunning=true;
-	}
-}
+			Display * d;
+			bool isRunning;
+	};
+};
 #endif //__PLATE_H__

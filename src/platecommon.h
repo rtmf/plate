@@ -12,4 +12,9 @@
 #include <GL/glu.h>
 #define PLATE_RETURN_SDL_FATAL 127
 #define PLATE_RETURN_OTHER_FATAL 63
+namespace PLATE
+{
+	class Display;
+	class Plate;
+}
 #endif //__PLATECOMMON_H__

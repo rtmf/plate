@@ -1,10 +1,14 @@
 #include "plate.h"
+#include "display.h"
 using namespace PLATE;
-void Plate::Plate(void)
+Plate::Plate(void)
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING))
-		
+	if (SDL_Init(SDL_INIT_EVERYTHING)!=0)
+	{
+		this->fatalSDLError("Plate::Plate");
+	}
 	d = new Display(this,640,480,"PLATE Demo");
+	isRunning=true;
 }
 void Plate::fatalSDLError(const char * context)
 {
@@ -19,7 +23,7 @@ void Plate::fatalError(const char * context, const char * err)
 	exit(PLATE_RETURN_OTHER_FATAL);
 }
 
-void Plate::main(int argc, char ** argv)
+int Plate::run(int argc, char ** argv)
 {
 	//main event loop
 	while(isRunning)
@@ -28,7 +32,7 @@ void Plate::main(int argc, char ** argv)
 	}
 	return 0;
 }
-void Plate::~Plate(void)
+Plate::~Plate(void)
 {
 	SDL_Quit();
 }
