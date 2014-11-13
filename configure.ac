@@ -1,0 +1,20 @@
+AC_INIT([PLAtform Engine], 0.0.1)
+AM_INIT_AUTOMAKE([1.9])
+AC_PROG_CXX
+AC_HEADER_STDC
+
+
+dnl SDL Check roughly as wiki states
+
+SDL_VERSION=2.0.0
+AM_PATH_SDL($SDL_VERSION,
+	:,
+	AC_MSG_ERROR([*** SDL Version $SDL_VERSION not found!])
+)
+CFLAGS="$CFLAGS $SDL_CFLAGS"
+CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+LIBS="$LIBS $SDL_LIBS"
+
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([src/Makefile])
+AC_OUTPUT

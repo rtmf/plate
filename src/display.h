@@ -6,17 +6,24 @@ namespace PLATE
 	class Display
 	{
 		public:
-			void Display(int w, int h, const char * title);
+			void Display(Plate * p, int w, int h, const char * title);
 
 			void resize(int w, int h)
 			void setTitle(const char * title);
+			void render(void);
 
 			void ~Display(void);
 
 		private:
-			SDL_Window * win;
-			int w,h;
+			Plate * plate=NULL;
 
+			SDL_Window * win=NULL;
+			SDL_Renderer * rrr=NULL;
+			int width=0,height=0;
+
+			void resetGL(void);
+			void resizeGL(void);
+			void clearGL(void);
 	}
 }
 #endif //__DISPLAY_H__
