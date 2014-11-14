@@ -1,8 +1,12 @@
 #include "display.h"
 #include "plate.h"
+#include "tileset.h"
+#include "tilelayer.h"
+#include <random>
 using namespace PLATE;
 Display::Display(Plate * p, int w, int h, const char * t)
 {
+	int x,y;
 	SDL_RendererInfo rendererInfo;
 	plate=p;
 	SDL_CreateWindowAndRenderer(w,h,SDL_WINDOW_OPENGL,&win,&rrr);
@@ -19,10 +23,42 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	glctx=SDL_GL_CreateContext(win);
 	width=w;
 	height=h;
-	xp=-1.5;
-	yp=0;
-	dx=0;
-	dy=0;
+	scroll=Vec2(0,0);
+	speed=Vec2(0,0);
+	
+	ctset=new ColorTileset(16,16);
+	tl=new TileLayer((Tileset *)ctset,100,100);
+	tl2=new TileLayer((Tileset *)ctset,100,100,Vec2(2,2));
+
+	ctset->setTile(0,255,0,0);
+	ctset->setTile(1,0,0,255);
+	ctset->setTile(2,255,0,255);
+	ctset->setTile(3,0,255,0);	
+	ctset->setTile(4,0,0,0,0);
+
+	for (x=0;x<100;x++)
+	{
+		tl->setTile(x,0,0);
+		tl2->setTile(x,0,0);
+		tl->setTile(x,1,1);
+		tl2->setTile(x,1,1);
+		tl->setTile(x,2,2);
+		tl2->setTile(x,2,2);
+		tl->setTile(x,3,3);
+		tl2->setTile(x,3,3);
+		tl->setTile(x,4,4);
+		tl2->setTile(x,4,4);
+	}
+	std::default_random_engine generator;
+	std::uniform_int_distribution<int> tiledist(0,4);
+	for (y=5;y<100;y++)
+		for (x=0;x<100;x++)
+		{
+			int tile=tiledist(generator);
+			tl->setTile(x,y,tile);
+			tl2->setTile(x,y,tile);
+		}
+
 	SDL_SetWindowTitle(win,t);
 	resetGL();
 	resizeGL();
@@ -43,31 +79,18 @@ SDL_Renderer * Display::getRenderer(void)
 void Display::resetGL(void)
 {
 	SDL_GL_MakeCurrent(win,glctx);
-	glShadeModel(GL_SMOOTH);
+//	glShadeModel(GL_SMOOTH);
 	this->clearGL();
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
 }
 void Display::resizeGL(void)
 {
-	GLfloat ratio,w,h;
 	SDL_GL_MakeCurrent(win,glctx);
-
-	h=height;
-	w=width;
-	if (height==0)
-		h=1;
-
-	ratio=w/h;
-	glViewport(0,0,(GLsizei)width,(GLsizei)height);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+	gluOrtho2D (0,width,0,height);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -76,8 +99,17 @@ void Display::resizeGL(void)
 void Display::clearGL(void)
 {
 	glClearColor(0.0f,0.0f,0.0f,0.0f);
-	glClearDepth(1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+void Display::render(void)
+{
+	scroll=scroll+speed;
+	SDL_GL_MakeCurrent(win,glctx);
+	this->clearGL();
+	tl2->render(this,scroll);
+	tl->render(this,scroll);
+
+	SDL_GL_SwapWindow(win);
 }
 void Display::resize(int w, int h)
 {
@@ -94,64 +126,44 @@ void Display::handleKey(SDL_KeyboardEvent k)
 	{
 		if (k.keysym.scancode==SDL_SCANCODE_LEFT ||
 			k.keysym.scancode==SDL_SCANCODE_RIGHT)
-			dx=0;
+			speed.x=0;
 		if (k.keysym.scancode==SDL_SCANCODE_UP ||
 			k.keysym.scancode==SDL_SCANCODE_DOWN)
-			dy=0;
+			speed.y=0;
 	}
 	else
 	{
 		switch(k.keysym.scancode)
 		{
 			case SDL_SCANCODE_LEFT:
-				dx=-0.01;
+				speed.x=-0.01;
 				break;
 			case SDL_SCANCODE_RIGHT:
-				dx=0.01;
+				speed.x=0.01;
 				break;
 			case SDL_SCANCODE_UP:
-				dy=0.01;
+				speed.y=0.01;
 				break;
 			case SDL_SCANCODE_DOWN:
-				dy=-0.01;
+				speed.y=-0.01;
 				break;
 			default:
 				break;
 		}
 	}
 }
-void Display::render(void)
+bool Display::GLok(const char* context, bool term_on_err)
 {
-	xp+=dx;
-	yp+=dy;
-	SDL_GL_MakeCurrent(win,glctx);
-	this->clearGL();
-
-	glLoadIdentity();
-	glTranslatef(xp,yp,-6.0f);
-
-	glBegin(GL_TRIANGLES);
+	GLenum err=glGetError();
+	if (err!=GL_NO_ERROR)
 	{
-		glVertex3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-1.0f, -1.0f, 0.0f);
-		glVertex3f(1.0f, -1.0f, 0.0f);
+		if (term_on_err)
+			this->plate->fatalError(context,(const char *)gluErrorString(err));
+		else
+			return false;
 	}
-	glEnd();
-
-	glTranslatef(3.0f, 0.0f, 0.0f);
-
-	glBegin(GL_QUADS);
-	{
-		glVertex3f(-1.0f, 1.0f, 0.0f);
-		glVertex3f(1.0f, 1.0f, 0.0f);
-		glVertex3f(1.0f, -1.0f, 0.0f);
-		glVertex3f(-1.0f, -1.0f, 0.0f);
-	}
-	glEnd();
-
-	SDL_GL_SwapWindow(win);
+	return true;
 }
-
 Display::~Display(void)
 {
 	if (win)

@@ -5,6 +5,7 @@
 
 	Requires:
 		SDL2
+		SDL2_Image
 		OpenGL
 */
 #include <SDL2/SDL.h>
@@ -18,6 +19,9 @@ namespace PLATE
 	class Plate;
 	class Config;
 	class Tileset;
+	class ColorTileset;
+	class TileLayer;
 	class Texture;
 }
+#include "vec2.h"
 #endif //__PLATECOMMON_H__

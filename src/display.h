@@ -15,18 +15,23 @@ namespace PLATE
 			SDL_Window * getWindow(void);
 			SDL_Renderer * getRenderer(void);
 			void handleKey(SDL_KeyboardEvent k);
+			bool GLok(const char* context="Display::GLok(unspecified)",bool term_on_err=true);
 
 			~Display(void);
 
 		private:
-			float dx,dy;
-			float xp,yp;
+			Vec2 scroll;
+			Vec2 speed;
 			Plate * plate=NULL;
 
 			SDL_Window * win=NULL;
 			SDL_Renderer * rrr=NULL;
 			SDL_GLContext glctx;
 			int width,height;
+
+			ColorTileset * ctset;
+			TileLayer * tl;
+			TileLayer * tl2;
 
 			void resetGL(void);
 			void resizeGL(void);

@@ -26,6 +26,11 @@ void Plate::fatalError(const char * context, const char * err)
 	SDL_Quit();
 	exit(PLATE_RETURN_OTHER_FATAL);
 }
+void Plate::logError(const char * context, const char * err)
+{
+	std::cerr<<"[PLATE] @{"<<context<<"} %%ERROR{\""<<err<<"\"}"<<std::endl;
+}
+
 
 int Plate::run(int argc, char ** argv)
 {
