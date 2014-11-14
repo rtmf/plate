@@ -19,6 +19,10 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	glctx=SDL_GL_CreateContext(win);
 	width=w;
 	height=h;
+	xp=-1.5;
+	yp=0;
+	dx=0;
+	dy=0;
 	SDL_SetWindowTitle(win,t);
 	resetGL();
 	resizeGL();
@@ -84,13 +88,47 @@ void Display::setTitle(const char * t)
 {
 	SDL_SetWindowTitle(win,t);
 }
+void Display::handleKey(SDL_KeyboardEvent k)
+{
+	if (k.type==SDL_KEYUP)
+	{
+		if (k.keysym.scancode==SDL_SCANCODE_LEFT ||
+			k.keysym.scancode==SDL_SCANCODE_RIGHT)
+			dx=0;
+		if (k.keysym.scancode==SDL_SCANCODE_UP ||
+			k.keysym.scancode==SDL_SCANCODE_DOWN)
+			dy=0;
+	}
+	else
+	{
+		switch(k.keysym.scancode)
+		{
+			case SDL_SCANCODE_LEFT:
+				dx=-0.01;
+				break;
+			case SDL_SCANCODE_RIGHT:
+				dx=0.01;
+				break;
+			case SDL_SCANCODE_UP:
+				dy=0.01;
+				break;
+			case SDL_SCANCODE_DOWN:
+				dy=-0.01;
+				break;
+			default:
+				break;
+		}
+	}
+}
 void Display::render(void)
 {
+	xp+=dx;
+	yp+=dy;
 	SDL_GL_MakeCurrent(win,glctx);
 	this->clearGL();
 
 	glLoadIdentity();
-	glTranslatef(-1.5f,0.0f,-6.0f);
+	glTranslatef(xp,yp,-6.0f);
 
 	glBegin(GL_TRIANGLES);
 	{

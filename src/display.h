@@ -14,10 +14,13 @@ namespace PLATE
 			Plate * getPlate(void);
 			SDL_Window * getWindow(void);
 			SDL_Renderer * getRenderer(void);
+			void handleKey(SDL_KeyboardEvent k);
 
 			~Display(void);
 
 		private:
+			float dx,dy;
+			float xp,yp;
 			Plate * plate=NULL;
 
 			SDL_Window * win=NULL;

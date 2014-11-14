@@ -41,6 +41,10 @@ int Plate::run(int argc, char ** argv)
 				case SDL_QUIT:
 					isRunning=false;
 					break;
+				case SDL_KEYDOWN:
+				case SDL_KEYUP:
+					d->handleKey(e.key);
+					break;
 				default:
 					break;
 			}
