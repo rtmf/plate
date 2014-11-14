@@ -1,0 +1,62 @@
+PLATE OpenGL PLATform Engine
+
+* DESIGN RATIONALE/ARCHITECTURE DOCUMENT
+	** THIS IS A WORK IN PROGRESS, THESE ENTRIES ARE NOT FINALIZED
+
+* initial target is 2D simple textured sprites & tileset bg/fg layers
+* classes of things we need then are:
+	** simple display layers with optional parallax scale
+		*** one tileset per layer, unlimited layers, mix tilesets by mixing layers and empty spots
+	** control layer
+		*** this is not a draw layer (except perhaps in a debug mode)
+		*** this layer defines "edges" and is 1:1 parallax by definition
+			**** initial support will be for simply standard edge-of-block edges
+			**** blocks will be enterable from / impassable from each edge as bits in the cell
+		*** this layer is also the owner of grid-attached objects, including:
+			**** warp edges
+			**** warp doors
+			**** activateable blocks
+			**** moving (scripted) platforms
+			**** other interactive blocks (falling platforms, bounce blocks, etc.)
+	** non-layer objects
+		*** player
+			**** control-bound/grid-free:interactive
+		*** enemies/mobs
+			**** control-bound/grid-free:scripted
+			**** scripted behaviour, interact with control layer
+		*** items
+			**** control-bound/grid-free:physical
+			**** basic behaviour, can be picked up and carried or otherwise manipulated but do not move on their own
+		*** special blocks
+			**** control-component:player/grid-bound
+			**** these have special interactions beyond simple edges
+		*** movable edges
+			**** control-component:all/grid-relative:scripted
+			**** these are both scripted moving platforms and things like timeout-fall or dis/reappearing floor
+			**** these have predictable grid-oriented behaviour but are not *strictly* grid-bound
+		*** warp edges, warp blocks(doors)
+			**** control-component:player/grid-bound
+			**** these are either on-collide or activatable grid-bound objects that send the player elsewhere
+			
+
+----
+
+* IMPLEMENTATION
+	** XXX THIS HAS BARELY BEGUN TO BECOME DEFINED
+	** PLATE::Classes
+		*** PLATE::Plate
+			the overarching game object itself
+		*** PLATE::Display
+			corresponds to the SDL_Window & GLContext
+		*** PLATE::Texture
+		*** PLATE::Tileset
+		*** PLATE::Sprite
+		*** PLATE::Animation?
+		*** PLATE::Layer
+		*** PLATE::Interactable
+		*** PLATE::Movable
+		*** PLATE::Player
+		*** PLATE::Enemy
+		*** PLATE::Scripted
+
+---
