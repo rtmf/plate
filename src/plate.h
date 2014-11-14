@@ -14,6 +14,7 @@ namespace PLATE
 			int run(int argc, char ** argv);
 			void fatalSDLError(const char * context);
 			void fatalError(const char * context,const char * err);
+			Display * getDisplay(void);
 
 			~Plate(void);
 			

@@ -11,6 +11,9 @@ namespace PLATE
 			void resize(int w, int h);
 			void setTitle(const char * title);
 			void render(void);
+			Plate * getPlate(void);
+			SDL_Window * getWindow(void);
+			SDL_Renderer * getRenderer(void);
 
 			~Display(void);
 
@@ -19,6 +22,7 @@ namespace PLATE
 
 			SDL_Window * win=NULL;
 			SDL_Renderer * rrr=NULL;
+			SDL_GLContext glctx;
 			int width,height;
 
 			void resetGL(void);

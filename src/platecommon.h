@@ -16,5 +16,8 @@ namespace PLATE
 {
 	class Display;
 	class Plate;
+	class Config;
+	class Tileset;
+	class Texture;
 }
 #endif //__PLATECOMMON_H__

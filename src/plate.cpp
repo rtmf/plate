@@ -10,6 +10,10 @@ Plate::Plate(void)
 	d = new Display(this,640,480,"PLATE Demo");
 	isRunning=true;
 }
+Display * Plate::getDisplay(void)
+{
+	return d;
+}
 void Plate::fatalSDLError(const char * context)
 {
 	std::cerr<<"[PLATE] @{"<<context<<"} %%SDL_ERROR{\""<<SDL_GetError()<<"\"} !!FATAL"<<std::endl;
@@ -25,9 +29,22 @@ void Plate::fatalError(const char * context, const char * err)
 
 int Plate::run(int argc, char ** argv)
 {
+	//TODO move event handling entirely
+	SDL_Event e;
 	//main event loop
 	while(isRunning)
 	{
+		while(SDL_PollEvent(&e))
+		{
+			switch(e.type)
+			{
+				case SDL_QUIT:
+					isRunning=false;
+					break;
+				default:
+					break;
+			}
+		}
 		d->render();
 	}
 	return 0;

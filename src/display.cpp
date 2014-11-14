@@ -16,6 +16,7 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	{
 		p->fatalError("PLATE::Display::Display","Could not set up accelerated render context / GL context");
 	}
+	glctx=SDL_GL_CreateContext(win);
 	width=w;
 	height=h;
 	SDL_SetWindowTitle(win,t);
@@ -23,9 +24,21 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	resizeGL();
 	clearGL();
 }
-
+Plate * Display::getPlate(void)
+{
+	return plate;
+}
+SDL_Window * Display::getWindow(void)
+{
+	return win;
+}
+SDL_Renderer * Display::getRenderer(void)
+{
+	return rrr;
+}
 void Display::resetGL(void)
 {
+	SDL_GL_MakeCurrent(win,glctx);
 	glShadeModel(GL_SMOOTH);
 	this->clearGL();
 
@@ -37,6 +50,7 @@ void Display::resetGL(void)
 void Display::resizeGL(void)
 {
 	GLfloat ratio,w,h;
+	SDL_GL_MakeCurrent(win,glctx);
 
 	h=height;
 	w=width;
@@ -72,6 +86,7 @@ void Display::setTitle(const char * t)
 }
 void Display::render(void)
 {
+	SDL_GL_MakeCurrent(win,glctx);
 	this->clearGL();
 
 	glLoadIdentity();
@@ -102,5 +117,8 @@ void Display::render(void)
 Display::~Display(void)
 {
 	if (win)
+	{
+		SDL_GL_DeleteContext(glctx);
 		SDL_DestroyWindow(win);
+	}
 }
