@@ -1,5 +1,45 @@
-* actually pick and set up a build system, build.sh is dumb. - not in milestones
+DONE
 
-* milestone 1 will be to init an sdl/ogl window and paint some portion of a mario tileset nabbed from the interwebs
-* milestone 2 will be defined asap.
-* milestone N is to have the basic dynamics of mario working, this is considered a bare minimum not a primary target
+* build system complete (basic at least) -- autotools chosen
+	** still should flesh out m4/* and generally normalize
+
+---
+
+CURRENTLY TODO
+
+* get DESIGN to a state I can work from it
+* figure out a basic sprite and tileset collection to use
+	** initial concept was mario, but it seems like a lot of work for 
+		something I plan to scrap anyway
+* debianize project
+	** this is relatively low priority but can be done more easily early
+		and maintaining it properly will help keep deps and changelog
+		properly managed
+* get from automake --foreign to compliant
+* GPL/copyright headerize all relevant files
+	** create basic vim/license/copyright header template
+		*** create script to apply/update template to files given
+			project name version and author info
+
+---
+
+MILESTONES
+
+* basic functionality will be considered complete when PLATE can handle a game
+	with requirements similar to SMB3
+	** shortly after it should be able to handle SMW1
+
+* next major target is displaying tiled layers for a level
+	** PRQ:texture loading
+		*** PRQ:find/load file on specified path
+			**** EG: find tiles.png in 
+				[$CONFDIR/override/textures,$BASEDIR/textures,$BASEDIR/../textures/,$BASEDIR/,$CWD/textures,$CWD/]
+* then comes basic player interaction with the level's control layer
+	** PRQ:configured input-event::control-event mappig
+		*** PRQ:configuration load/save/definition
+		*** PRQ:control-event implementation
+		*** PRQ:event pump
+			**** pull SDL events into PLATE queue
+			**** dispatch PLATE queue to listeners
+		*** transform raw SDL input events configurably into synthetic PLATE
+			control events
