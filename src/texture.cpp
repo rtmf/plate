@@ -21,10 +21,15 @@ Texture::Texture(Display * dpy, const char * basename)
 	if (tex==NULL)
 		dpy->getPlate()->fatalError("Texture::Texture","failed to load texture");
 	SDL_QueryTexture(tex,&format,&access,&w,&h);
+	if (SDL_ISPIXELFORMAT_ALPHA(format)) std::cout<<"Texture has alpha!"<<std::endl;
 }
 void Texture::Bind(float * texw, float * texh)
 {
 	SDL_GL_BindTexture(tex,texw,texh);
+}
+void Texture::Unbind(void)
+{
+	SDL_GL_UnbindTexture(tex);
 }
 Texture::~Texture(void)
 {

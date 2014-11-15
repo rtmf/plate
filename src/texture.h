@@ -8,6 +8,7 @@ namespace PLATE
 		public:
 			Texture(Display * dpy, const char * basename);
 			void Bind(float * texw=NULL,float * texh=NULL);
+			void Unbind(void);
 			~Texture(void);
 		private:
 			Display * d;

@@ -126,6 +126,7 @@ void Display::render(void)
 	glTexCoord2f(w,h); glVertex3d(width,height,0);
 	glTexCoord2f(0,h); glVertex3d(0,height,0);
 	glEnd();
+	tex->Unbind();
 	glDisable(GL_TEXTURE_2D);
 
 
