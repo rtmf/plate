@@ -5,4 +5,5 @@ plate_SOURCES = main.cpp \
 				display.cpp \
 				vec2.cpp \
 				tileset.cpp \
-				tilelayer.cpp
+				tilelayer.cpp \
+				texture.cpp

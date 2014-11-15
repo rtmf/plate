@@ -10,6 +10,7 @@
 */
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_image.h>
 #include <GL/glu.h>
 #define PLATE_RETURN_SDL_FATAL 127
 #define PLATE_RETURN_OTHER_FATAL 63

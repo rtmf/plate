@@ -32,6 +32,7 @@ namespace PLATE
 			ColorTileset * ctset;
 			TileLayer * tl;
 			TileLayer * tl2;
+			Texture * tex;
 
 			void resetGL(void);
 			void orthoGL(void);

@@ -4,6 +4,8 @@
 //#include "oglconsole.h"
 //XXX not using this yet
 #include <iostream>
+#include <vector>
+#include <string>
 namespace PLATE
 {
 	class Plate
@@ -17,9 +19,14 @@ namespace PLATE
 			void logError(const char * context,const char * err);
 			Display * getDisplay(void);
 
+			std::vector<std::string> getTextureSearchPath(void);
+			std::string getPathSep(void);
+
 			~Plate(void);
 			
 		private:
+			std::vector<std::string> textureSearchPath;
+			std::string pathsep;
 			Display * d;
 			bool isRunning;
 	};

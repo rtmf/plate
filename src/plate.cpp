@@ -3,13 +3,47 @@
 using namespace PLATE;
 Plate::Plate(void)
 {
+	char * temppath;
+	std::string basepath;
+	std::string prefpath;
+
 	if (SDL_Init(SDL_INIT_EVERYTHING)!=0)
 	{
 		this->fatalSDLError("Plate::Plate");
 	}
+
+	// XXX this is ugly, consider boost::filesystem & co
+
+	temppath=SDL_GetBasePath();
+	basepath=std::string(temppath);
+	SDL_free(temppath);
+	pathsep=basepath.substr(basepath.length()-1,1);
+	temppath=SDL_GetPrefPath("Concordia","PLATE Demo");
+	prefpath=std::string(temppath);
+	SDL_free(temppath);
+	textureSearchPath.push_back(prefpath+std::string("override")+
+		pathsep+std::string("textures")+pathsep);
+	textureSearchPath.push_back(basepath+std::string("textures")+pathsep);
+	textureSearchPath.push_back(basepath+std::string("..")+
+		pathsep+std::string("textures")+pathsep);
+	textureSearchPath.push_back(basepath);
+	textureSearchPath.push_back(std::string(".")+pathsep+std::string("textures")+pathsep);
+	textureSearchPath.push_back(std::string(".")+pathsep);
+
+
 	d = new Display(this,640,480,"PLATE Demo");
 	isRunning=true;
 }
+
+std::vector<std::string> Plate::getTextureSearchPath(void)
+{
+	return textureSearchPath;
+}
+std::string Plate::getPathSep(void)
+{
+	return pathsep;
+}
+
 Display * Plate::getDisplay(void)
 {
 	return d;

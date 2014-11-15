@@ -2,6 +2,7 @@
 #include "plate.h"
 #include "tileset.h"
 #include "tilelayer.h"
+#include "texture.h"
 #include <random>
 using namespace PLATE;
 Display::Display(Plate * p, int w, int h, const char * t)
@@ -58,6 +59,8 @@ Display::Display(Plate * p, int w, int h, const char * t)
 			tl->setTile(x,y,tile);
 			tl2->setTile(x,y,tile);
 		}
+	
+	tex=new Texture(this,"marioishBG16x16.png");
 
 	SDL_SetWindowTitle(win,t);
 	resetGL();
@@ -103,11 +106,27 @@ void Display::clearGL(void)
 }
 void Display::render(void)
 {
+	float w,h;
 	scroll=scroll+speed;
 	SDL_GL_MakeCurrent(win,glctx);
 	resetGL();
 	tl2->render(this,scroll);
 	tl->render(this,scroll);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	tex->Bind(&w,&h);
+	glColor4f(1.0,1.0,1.0,1.0);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0,0); glVertex3d(0,0,0);
+	glTexCoord2f(w,0); glVertex3d(width,0,0);
+	glTexCoord2f(w,h); glVertex3d(width,height,0);
+	glTexCoord2f(0,h); glVertex3d(0,height,0);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
 
 
 	SDL_GL_SwapWindow(win);
