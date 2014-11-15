@@ -30,11 +30,11 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	tl=new TileLayer((Tileset *)ctset,100,100);
 	tl2=new TileLayer((Tileset *)ctset,100,100,Vec2(2,2));
 
-	ctset->setTile(0,255,0,0);
-	ctset->setTile(1,0,0,255);
-	ctset->setTile(2,255,0,255);
-	ctset->setTile(3,0,255,0);	
-	ctset->setTile(4,0,0,0,0);
+	ctset->setTile(0,1.0,0.0,0.0,0.5);
+	ctset->setTile(1,0.0,0.0,1.0,0.5);
+	ctset->setTile(2,1.0,0.0,1.0,0.5);
+	ctset->setTile(3,0.0,1.0,0.0,0.5);	
+	ctset->setTile(4,0.0,0.0,0.0,0.0);
 
 	for (x=0;x<100;x++)
 	{

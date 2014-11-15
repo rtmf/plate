@@ -7,14 +7,6 @@ ColorTileset::ColorTileset(int tw, int th)
 	this->tw=tw;
 	this->th=th;
 }
-void ColorTileset::setTile(int index, SDL_Color c)
-{
-	setTile(index,c.r,c.g,c.b,c.a);
-}
-void ColorTileset::setTile(int index, int r, int g, int b, int a)
-{
-	setTile(index,r/255.0f,g/255.0f,b/255.0f);
-}
 void ColorTileset::setTile(int index, float r, float g, float b, float a)
 {
 	color4f c={r,g,b,a};
