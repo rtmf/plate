@@ -9,36 +9,49 @@ ColorTileset::ColorTileset(int tw, int th)
 }
 void ColorTileset::setTile(int index, SDL_Color c)
 {
-	tiles[index]=c;
+	setTile(index,c.r,c.g,c.b,c.a);
 }
 void ColorTileset::setTile(int index, int r, int g, int b, int a)
 {
-	SDL_Color c;
-	c.r=r;
-	c.g=g;
-	c.b=b;
-	c.a=a;
-	this->setTile(index,c);
+	setTile(index,r/255.0f,g/255.0f,b/255.0f);
 }
 void ColorTileset::setTile(int index, float r, float g, float b, float a)
 {
-	this->setTile(index,int(r*255),int(g*255),int(b*255),int(a*255));
+	color4f c={r,g,b,a};
+	setTile(index,c);
 }
-void ColorTileset::renderTile(Display * d, int index, int x, int y, Vec2 scroll, Vec2 parallax, Vec2 scale)
+void ColorTileset::setTile(int index,color4f c)
 {
-	Vec2 tpos=(Vec2(x*tw,y*th)*scale)-(scroll*parallax);
-	Vec2 text=(Vec2((x+1)*tw,(y+1)*th)*scale)-(scroll*parallax);
-	SDL_Color c=tiles[index];
+	tiles[index]=c;
+}
+void ColorTileset::renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 scale)
+{
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glTranslatef(scroll.x*parallax.x,scroll.y*parallax.y,0);
+	glScalef(tw*scale.x,th*scale.y,1);
+	glBegin(GL_QUADS);
+}
+void ColorTileset::renderTile(Display * d, int index, int x, int y)
+{
+	auto ci=tiles.find(index);
+	color4f c={0,0,0,0};
+	if (ci!=tiles.end()) c=ci->second;
 //	std::cout<<"Drawing quad ("<<tpos.x<<","<<tpos.y<<")-("<<text.x<<","<<text.y<<") in 4bRGBA("<<(int)c.r<<","<<(int)c.g<<","<<(int)c.b<<","<<(int)c.a<<")."<<std::endl;
 
-	d->GLok("ColorTilest::renderTile{pre-glColor4b}");
-	glColor4b(c.r,c.g,c.b,c.a);
-	d->GLok("ColorTilest::renderTile{post-glColor4b}");
-	glBegin(GL_QUADS);
-	glVertex3f(tpos.x,tpos.y,0);
-	glVertex3f(tpos.x,text.y,0);
-	glVertex3f(text.x,text.y,0);
-	glVertex3f(text.x,tpos.y,0);
+	glColor4f(c.r,c.g,c.b,c.a);
+	glVertex3f(x,y,0);
+	glVertex3f(x+1,y,0);
+	glVertex3f(x+1,y+1,0);
+	glVertex3f(x,y+1,0);
+}
+void ColorTileset::renderEnd(Display * d)
+{
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 	glEnd();
-	d->GLok("ColorTilest::renderTile{post-glEnd}");
 }

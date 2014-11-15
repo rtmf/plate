@@ -22,6 +22,13 @@ namespace PLATE
 	class ColorTileset;
 	class TileLayer;
 	class Texture;
+	struct color4f
+	{
+		float r;
+		float g;
+		float b;
+		float a;
+	};
 }
 #include "vec2.h"
 #endif //__PLATECOMMON_H__

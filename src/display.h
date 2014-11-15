@@ -8,7 +8,7 @@ namespace PLATE
 		public:
 			Display(Plate * p, int w, int h, const char * title);
 
-			void resize(int w, int h);
+			void setSize(int w, int h);
 			void setTitle(const char * title);
 			void render(void);
 			Plate * getPlate(void);
@@ -34,7 +34,7 @@ namespace PLATE
 			TileLayer * tl2;
 
 			void resetGL(void);
-			void resizeGL(void);
+			void orthoGL(void);
 			void clearGL(void);
 	};
 };

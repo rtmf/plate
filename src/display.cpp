@@ -61,8 +61,6 @@ Display::Display(Plate * p, int w, int h, const char * t)
 
 	SDL_SetWindowTitle(win,t);
 	resetGL();
-	resizeGL();
-	clearGL();
 }
 Plate * Display::getPlate(void)
 {
@@ -79,25 +77,27 @@ SDL_Renderer * Display::getRenderer(void)
 void Display::resetGL(void)
 {
 	SDL_GL_MakeCurrent(win,glctx);
-//	glShadeModel(GL_SMOOTH);
-	this->clearGL();
-
+	orthoGL();
+	clearGL();
 }
-void Display::resizeGL(void)
+void Display::orthoGL(void)
 {
 	SDL_GL_MakeCurrent(win,glctx);
+
+	glViewport(0,0,width,height);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluOrtho2D (0,width,0,height);
+	glOrtho (0,width,height,0,-1,1);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	this->clearGL();
+	clearGL();
 }
 void Display::clearGL(void)
 {
+	SDL_GL_MakeCurrent(win,glctx);
 	glClearColor(0.0f,0.0f,0.0f,0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -105,16 +105,20 @@ void Display::render(void)
 {
 	scroll=scroll+speed;
 	SDL_GL_MakeCurrent(win,glctx);
-	this->clearGL();
+	resetGL();
 	tl2->render(this,scroll);
 	tl->render(this,scroll);
 
+
 	SDL_GL_SwapWindow(win);
 }
-void Display::resize(int w, int h)
+void Display::setSize(int w, int h)
 {
 	//XXX this is not finished
-	this->resizeGL();
+	height=h;
+	width=w;
+	SDL_SetWindowSize(win,w,h);
+	resetGL();
 }
 void Display::setTitle(const char * t)
 {
@@ -136,16 +140,16 @@ void Display::handleKey(SDL_KeyboardEvent k)
 		switch(k.keysym.scancode)
 		{
 			case SDL_SCANCODE_LEFT:
-				speed.x=-0.01;
+				speed.x=1;
 				break;
 			case SDL_SCANCODE_RIGHT:
-				speed.x=0.01;
+				speed.x=-1;
 				break;
 			case SDL_SCANCODE_UP:
-				speed.y=0.01;
+				speed.y=1;
 				break;
 			case SDL_SCANCODE_DOWN:
-				speed.y=-0.01;
+				speed.y=-1;
 				break;
 			default:
 				break;
@@ -158,7 +162,7 @@ bool Display::GLok(const char* context, bool term_on_err)
 	if (err!=GL_NO_ERROR)
 	{
 		if (term_on_err)
-			this->plate->fatalError(context,(const char *)gluErrorString(err));
+			plate->fatalError(context,(const char *)gluErrorString(err));
 		else
 			return false;
 	}

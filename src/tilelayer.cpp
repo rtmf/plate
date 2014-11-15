@@ -34,9 +34,13 @@ void TileLayer::loadTiles(const int * src, int w, int h, int sx, int sy, int dx,
 void TileLayer::render(Display * d, Vec2 scroll)
 {
 	int x,y;
+	glDisable(GL_DEPTH_TEST);
+
+	t->renderBegin(d,scroll,p,s);
 	for (y=0;y<h;y++)
 		for (x=0;x<w;x++)
-			t->renderTile(d,getTile(x,y),x,y,scroll,p,s);
+			t->renderTile(d,getTile(x,y),x,y);
+	t->renderEnd(d);
 }
 TileLayer::~TileLayer()
 {
