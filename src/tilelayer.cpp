@@ -11,11 +11,6 @@ TileLayer::TileLayer(Tileset * tiles, int width, int height, Vec2 parallax, Vec2
 	tmap=new int[w*h]();
 	verts = new Vertex[w*h*4];
 	glGenBuffers(1, &vbo);
-
-        int fucker=0;
-        for (int y=0; y<h; y++)
-        for (int x=0; x<w; x++)
-          setTile(x, y, fucker++ % 1024);
 }
 void TileLayer::setTile(int x,int y, int index)
 {
