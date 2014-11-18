@@ -73,6 +73,8 @@ Display::Display(Plate * p, int w, int h, const char * t)
 
 	SDL_SetWindowTitle(win,t);
 	resetGL();
+        tl->refreshTiles();
+        tl2->refreshTiles();
 }
 Plate * Display::getPlate(void)
 {
