@@ -27,11 +27,7 @@ Display::Display(Plate * p, int w, int h, const char * t)
           printf("could not load OpenGL 2.1 and needed extensions\n");
           exit(-1);
         }
-        /* TEST GLAD */
-        GLuint buf;
-        glGenBuffers(1, &buf);
-        glDeleteBuffers(1, &buf);
-          
+
 	width=w;
 	height=h;
 	scroll=Vec2(0,0);
