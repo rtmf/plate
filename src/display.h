@@ -30,6 +30,7 @@ namespace PLATE
 			int width,height;
 
 			ColorTileset * ctset;
+			TextureTileset * ttset;
 			TileLayer * tl;
 			TileLayer * tl2;
 			Texture * tex;

@@ -21,6 +21,7 @@ namespace PLATE
 	class Config;
 	class Tileset;
 	class ColorTileset;
+	class TextureTileset;
 	class TileLayer;
 	class Texture;
 	struct color4f

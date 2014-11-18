@@ -27,5 +27,20 @@ namespace PLATE
 			std::map<int,color4f> tiles;
 			int tw,th;
 	};
+	class TextureTileset : public Tileset
+	{
+		public:
+			TextureTileset(Texture * t, int tw, int th);
+
+			virtual void renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 scale);
+			virtual void renderTile(Display * d, int index, int x, int y);
+			virtual void renderEnd(Display * d);
+
+		private:
+			Texture * tex;
+			int tw, th;
+			int trs;
+			float tcw, tch;
+	};
 };
 #endif //__TILESET_H__

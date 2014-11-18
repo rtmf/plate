@@ -1,6 +1,7 @@
 #include "tileset.h"
 #include <iostream>
 #include "display.h"
+#include "texture.h"
 using namespace PLATE;
 ColorTileset::ColorTileset(int tw, int th)
 {
@@ -47,3 +48,53 @@ void ColorTileset::renderEnd(Display * d)
 	glPopMatrix();
 	glEnd();
 }
+TextureTileset::TextureTileset(Texture * t, int tw, int th)
+{
+	this->tw=tw;
+	this->th=th;
+	this->tex=t;
+	this->trs=tex->getWidth()/tw;
+}
+void TextureTileset::renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 scale)
+{
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	tex->Bind(&tcw,&tch);
+	tcw/=tw;
+	tch/=th;
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glTranslatef(scroll.x*parallax.x,scroll.y*parallax.y,0);
+	glScalef(tw*scale.x,th*scale.y,1);
+	glColor4f(1.0,1.0,1.0,1.0);
+	glBegin(GL_QUADS);
+}
+void TextureTileset::renderTile(Display * d, int index, int x, int y)
+{
+	int ttx,tty;
+	float tx0,tx1,ty0,ty1;
+	tty=index/trs;
+	ttx=index%trs;
+	tx0=ttx*tcw;
+	tx1=(ttx+1)*tcw;
+	ty0=tty*tch;
+	ty1=(tty+1)*tch;
+	glTexCoord2f(tx0,ty0);
+	glVertex3f(x,y,0);
+	glTexCoord2f(tx1,ty0);
+	glVertex3f(x+1,y,0);
+	glTexCoord2f(tx1,ty1);
+	glVertex3f(x+1,y+1,0);
+	glTexCoord2f(tx0,ty1);
+	glVertex3f(x,y+1,0);
+}
+void TextureTileset::renderEnd(Display * d)
+{
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glEnd();
+	tex->Unbind();
+}
+

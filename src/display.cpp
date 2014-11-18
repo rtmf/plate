@@ -27,8 +27,10 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	scroll=Vec2(0,0);
 	speed=Vec2(0,0);
 	
+	tex=new Texture(this,"marioishBG16x16.png");
 	ctset=new ColorTileset(16,16);
-	tl=new TileLayer((Tileset *)ctset,100,100);
+	ttset=new TextureTileset(tex,16,16);
+	tl=new TileLayer((Tileset *)ttset,100,100);
 	tl2=new TileLayer((Tileset *)ctset,100,100,Vec2(2,2));
 
 	ctset->setTile(0,1.0,0.0,0.0,0.5);
@@ -60,7 +62,6 @@ Display::Display(Plate * p, int w, int h, const char * t)
 			tl2->setTile(x,y,tile);
 		}
 	
-	tex=new Texture(this,"marioishBG16x16.png");
 
 	SDL_SetWindowTitle(win,t);
 	resetGL();
@@ -112,24 +113,6 @@ void Display::render(void)
 	resetGL();
 	tl2->render(this,scroll);
 	tl->render(this,scroll);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-	tex->Bind(&w,&h);
-	glColor4f(1.0,1.0,1.0,1.0);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0,0); glVertex3d(0,0,0);
-	glTexCoord2f(w,0); glVertex3d(width,0,0);
-	glTexCoord2f(w,h); glVertex3d(width,height,0);
-	glTexCoord2f(0,h); glVertex3d(0,height,0);
-	glEnd();
-	tex->Unbind();
-	glDisable(GL_TEXTURE_2D);
-
-
 	SDL_GL_SwapWindow(win);
 }
 void Display::setSize(int w, int h)

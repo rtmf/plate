@@ -31,6 +31,22 @@ void Texture::Unbind(void)
 {
 	SDL_GL_UnbindTexture(tex);
 }
+int Texture::getWidth(void)
+{
+	return w;
+}
+int Texture::getHeight(void)
+{
+	return h;
+}
+Uint32 Texture::getFormat(void)
+{
+	return format;
+}
+int Texture::getAccess(void)
+{
+	return access;
+}
 Texture::~Texture(void)
 {
 	SDL_DestroyTexture(tex);

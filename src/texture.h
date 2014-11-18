@@ -9,6 +9,10 @@ namespace PLATE
 			Texture(Display * dpy, const char * basename);
 			void Bind(float * texw=NULL,float * texh=NULL);
 			void Unbind(void);
+			int getWidth(void);
+			Uint32 getFormat(void);
+			int getAccess(void);
+			int getHeight(void);
 			~Texture(void);
 		private:
 			Display * d;
