@@ -22,6 +22,16 @@ Display::Display(Plate * p, int w, int h, const char * t)
 		p->fatalError("PLATE::Display::Display","Could not set up accelerated render context / GL context");
 	}
 	glctx=SDL_GL_CreateContext(win);
+        if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
+        {
+          printf("could not load OpenGL 2.1 and needed extensions\n");
+          exit(-1);
+        }
+        /* TEST GLAD */
+        GLuint buf;
+        glGenBuffers(1, &buf);
+        glDeleteBuffers(1, &buf);
+          
 	width=w;
 	height=h;
 	scroll=Vec2(0,0);
@@ -167,7 +177,7 @@ bool Display::GLok(const char* context, bool term_on_err)
 	if (err!=GL_NO_ERROR)
 	{
 		if (term_on_err)
-			plate->fatalError(context,(const char *)gluErrorString(err));
+			plate->fatalError(context,"some error");//(const char *)gluErrorString(err));
 		else
 			return false;
 	}
