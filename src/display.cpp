@@ -54,11 +54,13 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	}
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> tiledist(0,4);
+	std::uniform_int_distribution<int> tiledist2(0,(512/16)*(512/16)-1);
 	for (y=5;y<100;y++)
 		for (x=0;x<100;x++)
 		{
-			int tile=tiledist(generator);
+			int tile=tiledist2(generator);
 			tl->setTile(x,y,tile);
+			tile=tiledist(generator);
 			tl2->setTile(x,y,tile);
 		}
 	

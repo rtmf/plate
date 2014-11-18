@@ -53,7 +53,8 @@ TextureTileset::TextureTileset(Texture * t, int tw, int th)
 	this->tw=tw;
 	this->th=th;
 	this->tex=t;
-	this->trs=tex->getWidth()/tw;
+	this->txc=tex->getWidth()/tw;
+	this->tyc=tex->getHeight()/th;
 }
 void TextureTileset::renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 scale)
 {
@@ -61,8 +62,8 @@ void TextureTileset::renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 s
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	tex->Bind(&tcw,&tch);
-	tcw/=tw;
-	tch/=th;
+	tcw/=txc;
+	tch/=tyc;
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -75,8 +76,8 @@ void TextureTileset::renderTile(Display * d, int index, int x, int y)
 {
 	int ttx,tty;
 	float tx0,tx1,ty0,ty1;
-	tty=index/trs;
-	ttx=index%trs;
+	tty=index/txc;
+	ttx=index%txc;
 	tx0=ttx*tcw;
 	tx1=(ttx+1)*tcw;
 	ty0=tty*tch;

@@ -39,7 +39,7 @@ namespace PLATE
 		private:
 			Texture * tex;
 			int tw, th;
-			int trs;
+			int txc, tyc;
 			float tcw, tch;
 	};
 };
