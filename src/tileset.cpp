@@ -64,8 +64,8 @@ void TextureTileset::renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 s
 	glClientActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex->getTextureName());
 
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
