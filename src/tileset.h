@@ -35,11 +35,15 @@ namespace PLATE
 			virtual void renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 scale);
 			virtual void renderTile(Display * d, int index, int x, int y);
 			virtual void renderEnd(Display * d);
+			virtual void getTileTexCoords(int index, float * texCoords);
 
 		private:
 			Texture * tex;
+			/* number of pixels per tile */
 			int tw, th;
+			/* number of tiles per texture */
 			int txc, tyc;
+			/* reciprocal of tiles per texture */
 			float tcw, tch;
 	};
 };

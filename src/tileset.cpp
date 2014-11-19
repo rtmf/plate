@@ -27,8 +27,8 @@ void ColorTileset::renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 sca
 	glLoadIdentity();
 	glTranslatef(scroll.x*parallax.x,scroll.y*parallax.y,0);
 	glScalef(tw*scale.x,th*scale.y,1);
-	glBegin(GL_QUADS);
 }
+/* TODO: remove */
 void ColorTileset::renderTile(Display * d, int index, int x, int y)
 {
 	auto ci=tiles.find(index);
@@ -46,32 +46,36 @@ void ColorTileset::renderEnd(Display * d)
 {
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-	glEnd();
 }
+/* tw * th is the number of pixels found in a tile */
 TextureTileset::TextureTileset(Texture * t, int tw, int th)
 {
 	this->tw=tw;
 	this->th=th;
 	this->tex=t;
-	this->txc=tex->getWidth()/tw;
-	this->tyc=tex->getHeight()/th;
+	txc=tex->getWidth()/tw;
+	tyc=tex->getHeight()/th;
+	tcw=1.0/txc;
+	tch=1.0/tyc;
 }
 void TextureTileset::renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 scale)
 {
 	glEnable(GL_TEXTURE_2D);
+	glClientActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex->getTextureName());
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-	tex->Bind(&tcw,&tch);
-	tcw/=txc;
-	tch/=tyc;
+
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
 	glTranslatef(scroll.x*parallax.x,scroll.y*parallax.y,0);
 	glScalef(tw*scale.x,th*scale.y,1);
+
 	glColor4f(1.0,1.0,1.0,1.0);
-	glBegin(GL_QUADS);
 }
+/* TODO: remove */
 void TextureTileset::renderTile(Display * d, int index, int x, int y)
 {
 	int ttx,tty;
@@ -91,11 +95,23 @@ void TextureTileset::renderTile(Display * d, int index, int x, int y)
 	glTexCoord2f(tx0,ty1);
 	glVertex3f(x,y+1,0);
 }
+void TextureTileset::getTileTexCoords(int index, float * texCoords)
+{
+	int ttx,tty;
+	float tx0,tx1,ty0,ty1;
+	tty=index/txc;
+	ttx=index%txc;
+	texCoords[0]=ttx*tcw;
+	texCoords[1]=(ttx+1)*tcw;
+	texCoords[2]=tty*tch;
+	texCoords[3]=(tty+1)*tch;
+}
 void TextureTileset::renderEnd(Display * d)
 {
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-	glEnd();
-	tex->Unbind();
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(GL_TEXTURE_2D);
 }
 

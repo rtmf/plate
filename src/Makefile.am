@@ -6,4 +6,8 @@ plate_SOURCES = main.cpp \
 				vec2.cpp \
 				tileset.cpp \
 				tilelayer.cpp \
-				texture.cpp
+				texture.cpp \
+				glad.c
+
+# This might belong in top-level Makefile.am???
+AM_CPPFLAGS = -I../include
