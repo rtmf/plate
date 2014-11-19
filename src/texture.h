@@ -7,16 +7,13 @@ namespace PLATE
 	{
 		public:
 			Texture(Display * dpy, const char * basename);
-			void Bind(float * texw=NULL,float * texh=NULL);
-			void Unbind(void);
 			int getWidth(void);
-			Uint32 getFormat(void);
-			int getAccess(void);
 			int getHeight(void);
+			GLint getTextureName(void);
 			~Texture(void);
 		private:
 			Display * d;
-			SDL_Texture * tex;
+			GLuint tex;
 			Uint32 format;
 			int access;
 			int w;

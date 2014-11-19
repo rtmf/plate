@@ -14,6 +14,8 @@ namespace PLATE
 			void setTile(int x, int y, int index);
 			int getTile(int x, int y);
 			void loadTiles(const int * src, int w, int h, int sx=0, int sy=0, int dx=0, int dy=0, int rowstride=0);
+                        /* A way to batch-update the entire tile-layer to the GL */
+                        void refreshTiles();
 
 			~TileLayer();
 
@@ -24,6 +26,18 @@ namespace PLATE
 			int * tmap;
 			Vec2 p;
 			Vec2 s;
+                        /* A buffer to hold all vertex attributes */
+                        struct Vertex
+                        {
+                          float x, y, s, t;
+                          Vertex(float x, float y, float s, float t) :
+                            x(x), y(y), s(s), t(t)
+                          {}
+                          Vertex(){}
+                        };
+                        Vertex * verts;
+                        /* A vertex buffer object for the same! */
+                        GLuint vbo;
 	};
 };
 #endif //__TILELAYER_H__
