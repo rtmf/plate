@@ -11,9 +11,8 @@ AC_SEARCH_LIBS([dlopen], [dl dld], [], [
 	AC_MSG_ERROR([unable to find the dlopen() function])
 ])
 
-dnl AX GL/GLU
+dnl AX GL
 AX_CHECK_GL
-AX_CHECK_GLU
 
 dnl SDL Check roughly as wiki states
 
