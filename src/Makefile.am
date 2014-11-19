@@ -7,7 +7,8 @@ plate_SOURCES = main.cpp \
 				tileset.cpp \
 				tilelayer.cpp \
 				texture.cpp \
-				glad.c
+				glad.c \
+				oglconsole.c
 
 # This might belong in top-level Makefile.am???
-AM_CPPFLAGS = -I../include
+AM_CPPFLAGS = -I../include -DOGLCONSOLE_USE_SDL

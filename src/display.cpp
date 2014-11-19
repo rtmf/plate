@@ -3,6 +3,7 @@
 #include "tileset.h"
 #include "tilelayer.h"
 #include "texture.h"
+#include "oglconsole.h"
 #include <random>
 using namespace PLATE;
 Display::Display(Plate * p, int w, int h, const char * t)
@@ -77,6 +78,7 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	resetGL();
         tl->refreshTiles();
         tl2->refreshTiles();
+	OGLCONSOLE_Create();
 }
 Plate * Display::getPlate(void)
 {
@@ -129,6 +131,7 @@ void Display::render(void)
 	resetGL();
 	tl2->render(this,scroll);
 	tl->render(this,scroll);
+	OGLCONSOLE_Draw();
 	SDL_GL_SwapWindow(win);
 	frames++;
 	if (frames==100) {
@@ -200,4 +203,5 @@ Display::~Display(void)
 		SDL_GL_DeleteContext(glctx);
 		SDL_DestroyWindow(win);
 	}
+	OGLCONSOLE_Quit();
 }

@@ -1,5 +1,6 @@
 #include "plate.h"
 #include "display.h"
+#include "oglconsole.h"
 using namespace PLATE;
 Plate::Plate(void)
 {
@@ -75,17 +76,20 @@ int Plate::run(int argc, char ** argv)
 	{
 		while(SDL_PollEvent(&e))
 		{
-			switch(e.type)
+			if (!OGLCONSOLE_SDLEvent(&e))
 			{
-				case SDL_QUIT:
-					isRunning=false;
-					break;
-				case SDL_KEYDOWN:
-				case SDL_KEYUP:
-					d->handleKey(e.key);
-					break;
-				default:
-					break;
+				switch(e.type)
+				{
+					case SDL_QUIT:
+						isRunning=false;
+						break;
+					case SDL_KEYDOWN:
+					case SDL_KEYUP:
+						d->handleKey(e.key);
+						break;
+					default:
+						break;
+				}
 			}
 		}
 		d->render();
