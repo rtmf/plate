@@ -60,7 +60,7 @@ void TileLayer::refreshTiles()
 
 	/* Send vertex data to GL */
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, w * h * sizeof(*verts), verts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, w * h * sizeof(*verts) * 4, verts, GL_STATIC_DRAW);
 }
 
 void TileLayer::render(Display * d, Vec2 scroll)

@@ -39,7 +39,7 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	ctset=new ColorTileset(16,16);
 	ttset=new TextureTileset(tex,16,16);
 	tl=new TileLayer((Tileset *)ttset,100,100);
-	tl2=new TileLayer((Tileset *)ctset,100,100,Vec2(-2,-2));
+	tl2=new TileLayer((Tileset *)ttset,100,100,Vec2(-2,-2));
 
 	ctset->setTile(0,1.0,0.0,0.0,0.5);
 	ctset->setTile(1,0.0,0.0,1.0,0.5);
@@ -68,7 +68,7 @@ Display::Display(Plate * p, int w, int h, const char * t)
 		{
 			int tile=tiledist2(generator);
 			tl->setTile(x,y,tile);
-			tile=tiledist(generator);
+//			tile=tiledist(generator);
 			tl2->setTile(x,y,tile);
 		}
 	

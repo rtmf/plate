@@ -7,6 +7,10 @@ AC_PROG_CXX
 AC_HEADER_STDC
 AX_CXX_COMPILE_STDCXX_11
 
+AC_SEARCH_LIBS([dlopen], [dl dld], [], [
+	AC_MSG_ERROR([unable to find the dlopen() function])
+])
+
 dnl AX GL/GLU
 AX_CHECK_GL
 AX_CHECK_GLU
