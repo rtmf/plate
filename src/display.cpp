@@ -27,11 +27,13 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	scroll=Vec2(0,0);
 	speed=Vec2(0,0);
 	
+	SDL_GL_SetSwapInterval(1);
+
 	tex=new Texture(this,"marioishBG16x16.png");
 	ctset=new ColorTileset(16,16);
 	ttset=new TextureTileset(tex,16,16);
 	tl=new TileLayer((Tileset *)ttset,100,100);
-	tl2=new TileLayer((Tileset *)ctset,100,100,Vec2(2,2));
+	tl2=new TileLayer((Tileset *)ctset,100,100,Vec2(-2,-2));
 
 	ctset->setTile(0,1.0,0.0,0.0,0.5);
 	ctset->setTile(1,0.0,0.0,1.0,0.5);
@@ -110,12 +112,22 @@ void Display::clearGL(void)
 void Display::render(void)
 {
 	float w,h;
+	static int frames=0;
+	static Uint32 frametime;
+	float fps;
+	if (frames==0) frametime=SDL_GetTicks();
 	scroll=scroll+speed;
 	SDL_GL_MakeCurrent(win,glctx);
 	resetGL();
 	tl2->render(this,scroll);
 	tl->render(this,scroll);
 	SDL_GL_SwapWindow(win);
+	frames++;
+	if (frames==100) {
+		frames=0;
+		fps=100.0f/((float)(SDL_GetTicks()-frametime)/1000.0f);
+		std::cout<<"FPS:"<<fps<<std::endl;
+	}
 }
 void Display::setSize(int w, int h)
 {
