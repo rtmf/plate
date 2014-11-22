@@ -36,6 +36,7 @@ namespace PLATE
 			virtual void renderTile(Display * d, int index, int x, int y);
 			virtual void renderEnd(Display * d);
 			virtual void getTileTexCoords(int index, float * texCoords);
+			virtual void getTileCoords(int index, int * tpx, int * tpy);
 
 		private:
 			Texture * tex;

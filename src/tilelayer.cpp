@@ -9,8 +9,10 @@ TileLayer::TileLayer(Tileset * tiles, int width, int height, Vec2 parallax, Vec2
 	p=parallax;
 	s=scale;
 	tmap=new int[w*h]();
+	ttex=new unsigned char[w*h*4]; 
 	verts = new Vertex[w*h*4];
 	glGenBuffers(1, &vbo);
+	glGenTextures(1,&ttexID);
 }
 void TileLayer::setTile(int x,int y, int index)
 {
@@ -55,12 +57,25 @@ void TileLayer::refreshTiles()
 			vert[2] = Vertex(x+1, y+1, texCoords[1], texCoords[3]);
 			vert[3] = Vertex(x,   y+1, texCoords[0], texCoords[3]);
 			vert += 4;
+			int tpx,tpy;
+			tt->getTileCoords(getTile(x,y),&tpx,&tpy);
+			ttex[(x+y*w)*4]=tpx;
+			ttex[(x+y*w)*4+1]=tpy;
 		}
 	}
 
 	/* Send vertex data to GL */
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, w * h * sizeof(*verts) * 4, verts, GL_STATIC_DRAW);
+
+	glBindTexture(GL_TEXTURE_2D,ttexID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,w,h,0,GL_RGBA,GL_UNSIGNED_BYTE,ttex);
+	glBindTexture(GL_TEXTURE_2D,0);
+
 }
 
 void TileLayer::render(Display * d, Vec2 scroll)
@@ -85,7 +100,9 @@ void TileLayer::render(Display * d, Vec2 scroll)
 }
 TileLayer::~TileLayer()
 {
+	glDeleteTextures(1,&ttexID);
 	glDeleteBuffers(1, &vbo);
 	delete tmap;
+	delete ttex;
 }
 

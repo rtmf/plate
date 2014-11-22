@@ -106,6 +106,11 @@ void TextureTileset::getTileTexCoords(int index, float * texCoords)
 	texCoords[2]=tty*tch;
 	texCoords[3]=(tty+1)*tch;
 }
+void TextureTileset::getTileCoords(int index, int * tpx, int * tpy)
+{
+	*tpx=index%txc;
+	*tpy=index/txc;
+}
 void TextureTileset::renderEnd(Display * d)
 {
 	glMatrixMode(GL_MODELVIEW);

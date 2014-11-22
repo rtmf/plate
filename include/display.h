@@ -38,6 +38,20 @@ namespace PLATE
 			void resetGL(void);
 			void orthoGL(void);
 			void clearGL(void);
+
+			GLuint vs,fs,sp;
+
+			GLuint vbo;
+			float verts[]={
+            //x  y  u  v
+            -1, -1, 0, 1,
+             1, -1, 1, 1,
+             1,  1, 1, 0,
+
+            -1, -1, 0, 1,
+             1,  1, 1, 0,
+            -1,  1, 0, 0
+			};
 	};
 };
 #endif //__DISPLAY_H__

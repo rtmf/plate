@@ -24,6 +24,8 @@ namespace PLATE
 			int w;
 			int h;
 			int * tmap;
+			unsigned char * ttex;
+			GLuint ttexID;
 			Vec2 p;
 			Vec2 s;
                         /* A buffer to hold all vertex attributes */
