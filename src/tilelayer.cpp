@@ -1,5 +1,6 @@
 #include "tilelayer.h"
 #include "tileset.h"
+#include "display.h"
 using namespace PLATE;
 TileLayer::TileLayer(Tileset * tiles, int width, int height, Vec2 parallax, Vec2 scale)
 {
@@ -13,6 +14,8 @@ TileLayer::TileLayer(Tileset * tiles, int width, int height, Vec2 parallax, Vec2
 	verts = new Vertex[w*h*4];
 	glGenBuffers(1, &vbo);
 	glGenTextures(1,&ttexID);
+	inverseTileTextureSize[0]=1.0f/(float)w;
+	inverseTileTextureSize[1]=1.0f/(float)h;
 }
 void TileLayer::setTile(int x,int y, int index)
 {
@@ -78,6 +81,23 @@ void TileLayer::refreshTiles()
 
 }
 
+void TileLayer::makeCurrent(Display * d, Vec2 scroll)
+{
+	Vec2 thisscroll=scroll*p*s;
+	float viewOffset[2];
+	TextureTileset * tt = dynamic_cast<TextureTileset*>(t);
+	if (tt == NULL)
+		return;
+	tt->makeCurrent(d);
+	glActiveTexture(GL_TEXTURE1);
+	glUniform1i(d->spuTiles,1);
+	glBindTexture(GL_TEXTURE_2D,ttexID);
+	viewOffset[0]=thisscroll.x;
+	viewOffset[1]=thisscroll.y;
+	glUniform2fv(d->spuViewOffset,1,viewOffset);
+	glUniform2fv(d->spuInverseTileTextureSize,1,inverseTileTextureSize);
+}
+
 void TileLayer::render(Display * d, Vec2 scroll)
 {
 	/* TODO implement ColorTileset as well! */
@@ -86,7 +106,7 @@ void TileLayer::render(Display * d, Vec2 scroll)
 		return;
 	tt->renderBegin(d,scroll,p,s);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	/*glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, x));
@@ -94,7 +114,7 @@ void TileLayer::render(Display * d, Vec2 scroll)
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, s));
 
-	glDrawArrays(GL_QUADS, 0, w * h * 4);
+	glDrawArrays(GL_QUADS, 0, w * h * 4);*/
 
 	tt->renderEnd(d);
 }

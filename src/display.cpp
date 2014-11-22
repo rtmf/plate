@@ -137,6 +137,17 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	glAttachShader(sp,vs);
 	glAttachShader(sp,fs);
 	glLinkProgram(sp);
+	spaPosition=glGetAttribLocation(sp,"position");
+	spaTexture=glGetAttribLocation(sp,"texture");
+	spuViewportSize=glGetUniformLocation(sp,"viewportSize");
+	spuInverseSpriteTextureSize=glGetUniformLocation(sp,"inverseSpriteTextureSize");
+	spuTileSize=glGetUniformLocation(sp,"tileSize");
+	spuInverseTileSize=glGetUniformLocation(sp,"inverseTileSize");
+	spuSprites=glGetUniformLocation(sp,"sprites");
+	spuTiles=glGetUniformLocation(sp,"tiles");
+	spuViewOffset=glGetUniformLocation(sp,"viewOffset");
+	spuInverseTileTextureSize=glGetUniformLocation(sp,"inverseTileTextureSize");
+	glGenBuffers(1,&vbo);
 }
 Plate * Display::getPlate(void)
 {
@@ -152,6 +163,14 @@ SDL_Renderer * Display::getRenderer(void)
 }
 void Display::resetGL(void)
 {
+	int i;
+	for (i=0;i<6;i++)
+	{
+		verts[i*4]=width*verts[i*4+2];
+		verts[i*4+1]=height*verts[i*4+3];
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, 24, verts, GL_STATIC_DRAW);
 	SDL_GL_MakeCurrent(win,glctx);
 	orthoGL();
 	clearGL();
@@ -187,8 +206,27 @@ void Display::render(void)
 	scroll=scroll+speed;
 	SDL_GL_MakeCurrent(win,glctx);
 	resetGL();
-	tl2->render(this,scroll);
-	tl->render(this,scroll);
+
+	glUseProgram(sp);
+	glBindBuffer(GL_ARRAY_BUFFER,vbo);
+	glEnableVertexAttribArray(spaPosition);
+	glEnableVertexAttribArray(spaTexture);
+	glVertexAttribPointer(spaPosition,2,GL_FLOAT,false,16,(void *)0);
+	glVertexAttribPointer(spaTexture,2,GL_FLOAT,false,16,(void *)8);
+	glUniform2fv(spuViewportSize,1,viewportSize);
+	tl2->makeCurrent(this,scroll);
+	glDrawArrays(GL_TRIANGLES,0,6);
+	tl->makeCurrent(this,scroll);
+	glDrawArrays(GL_TRIANGLES,0,6);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D,0);
+	glUseProgram(0);
+
+
+	//tl2->render(this,scroll);
+	//tl->render(this,scroll);
 	OGLCONSOLE_Draw();
 	SDL_GL_SwapWindow(win);
 	frames++;
@@ -256,6 +294,7 @@ bool Display::GLok(const char* context, bool term_on_err)
 }
 Display::~Display(void)
 {
+	glDeleteBuffers(1,&vbo);
 	if (win)
 	{
 		SDL_GL_DeleteContext(glctx);

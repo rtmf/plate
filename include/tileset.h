@@ -37,8 +37,12 @@ namespace PLATE
 			virtual void renderEnd(Display * d);
 			virtual void getTileTexCoords(int index, float * texCoords);
 			virtual void getTileCoords(int index, int * tpx, int * tpy);
+			void makeCurrent(Display * d);
 
 		private:
+			float inverseTextureSize[2];
+			float inverseTileSize;
+			float tileSize;
 			Texture * tex;
 			/* number of pixels per tile */
 			int tw, th;

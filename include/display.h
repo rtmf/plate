@@ -19,6 +19,13 @@ namespace PLATE
 
 			~Display(void);
 
+
+			GLuint vs,fs,sp;
+			GLuint spaPosition, spaTexture;
+			GLuint spuViewportSize,spuInverseSpriteTextureSize,spuTileSize,
+				spuInverseTileSize,spuSprites,spuTiles,spuViewOffset,
+				spuInverseTileTextureSize;
+
 		private:
 			Vec2 scroll;
 			Vec2 speed;
@@ -39,18 +46,19 @@ namespace PLATE
 			void orthoGL(void);
 			void clearGL(void);
 
-			GLuint vs,fs,sp;
+
+			float viewportSize[2];
 
 			GLuint vbo;
-			float verts[]={
+			float verts[24]={
             //x  y  u  v
-            -1, -1, 0, 1,
-             1, -1, 1, 1,
-             1,  1, 1, 0,
+             0,  1, 0, 1,
+             1,  1, 1, 1,
+             1,  0, 1, 0,
 
-            -1, -1, 0, 1,
-             1,  1, 1, 0,
-            -1,  1, 0, 0
+             0,  1, 0, 1,
+             1,  0, 1, 0,
+             0,  0, 0, 0
 			};
 	};
 };

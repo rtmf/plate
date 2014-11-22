@@ -57,6 +57,10 @@ TextureTileset::TextureTileset(Texture * t, int tw, int th)
 	tyc=tex->getHeight()/th;
 	tcw=1.0/txc;
 	tch=1.0/tyc;
+	inverseTextureSize[0]=1.0f/(float)tex->getWidth();
+	inverseTextureSize[1]=1.0f/(float)tex->getHeight();
+	tileSize=tw;
+	inverseTileSize=1.0f/tileSize;
 }
 void TextureTileset::renderBegin(Display * d, Vec2 scroll, Vec2 parallax, Vec2 scale)
 {
@@ -119,4 +123,12 @@ void TextureTileset::renderEnd(Display * d)
         glBindTexture(GL_TEXTURE_2D, 0);
         glDisable(GL_TEXTURE_2D);
 }
-
+void TextureTileset::makeCurrent(Display * d)
+{
+	glActiveTexture(GL_TEXTURE0);
+	glUniform2fv(d->spuInverseSpriteTextureSize,1,inverseTextureSize);
+	glUniform1f(d->spuTileSize,tileSize);
+	glUniform1f(d->spuInverseTileSize,inverseTileSize);
+	glBindTexture(GL_TEXTURE_2D,tex->getTextureName());
+	glUniform1i(d->spuSprites,0);
+}

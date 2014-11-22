@@ -17,9 +17,12 @@ namespace PLATE
                         /* A way to batch-update the entire tile-layer to the GL */
                         void refreshTiles();
 
+			void makeCurrent(Display * d, Vec2 scroll);
+
 			~TileLayer();
 
 		private:
+			float inverseTileTextureSize[2];
 			Tileset * t;
 			int w;
 			int h;
