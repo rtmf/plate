@@ -218,9 +218,9 @@ void Display::render(void)
 	glDrawArrays(GL_TRIANGLES,0,6);
 	tl->makeCurrent(this,scroll);
 	glDrawArrays(GL_TRIANGLES,0,6);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D,0);
 	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D,0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D,0);
 	glUseProgram(0);
 
