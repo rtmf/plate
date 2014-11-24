@@ -123,9 +123,15 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	
 
 	SDL_SetWindowTitle(win,t);
-	resetGL();
-        tl->refreshTiles();
-        tl2->refreshTiles();
+
+	staticGLInitialization();
+
+	/* Initialize viewPort size, sent to shader uniform of same name. */
+	viewportSize[0] = 640; // XXX don't hard-code
+	viewportSize[1] = 480; // XXX don't hard-code
+
+	tl->refreshTiles();
+	tl2->refreshTiles();
 	OGLCONSOLE_Create();
 	vs=glCreateShader(GL_VERTEX_SHADER);
 	fs=glCreateShader(GL_FRAGMENT_SHADER);
@@ -147,7 +153,27 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	spuTiles=glGetUniformLocation(sp,"tiles");
 	spuViewOffset=glGetUniformLocation(sp,"viewOffset");
 	spuInverseTileTextureSize=glGetUniformLocation(sp,"inverseTileTextureSize");
-	glGenBuffers(1,&vbo);
+}
+GLuint Display::vbo = 0;
+void Display::staticGLInitialization()
+{
+	/* Create a vertex buffer with a single quad filling the entire viewable volume
+	 * in Normalized Device Coordinates, also spanning all of texture space as well.
+	 */
+	float verts[24] = {
+	//   x   y  u  v
+		-1,  1, 0, 1,
+		 1,  1, 1, 1,
+		 1, -1, 1, 0,
+
+		-1,  1, 0, 1,
+		 1, -1, 1, 0,
+		-1, -1, 0, 0
+	};
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 Plate * Display::getPlate(void)
 {
@@ -161,41 +187,6 @@ SDL_Renderer * Display::getRenderer(void)
 {
 	return rrr;
 }
-void Display::resetGL(void)
-{
-	int i;
-	for (i=0;i<6;i++)
-	{
-		verts[i*4]=width*verts[i*4+2];
-		verts[i*4+1]=height*verts[i*4+3];
-	}
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, 24, verts, GL_STATIC_DRAW);
-	SDL_GL_MakeCurrent(win,glctx);
-	orthoGL();
-	clearGL();
-}
-void Display::orthoGL(void)
-{
-	SDL_GL_MakeCurrent(win,glctx);
-
-	glViewport(0,0,width,height);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	glOrtho (0,width,height,0,-1,1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	clearGL();
-}
-void Display::clearGL(void)
-{
-	SDL_GL_MakeCurrent(win,glctx);
-	glClearColor(0.0f,0.0f,0.0f,0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-}
 void Display::render(void)
 {
 	float w,h;
@@ -205,7 +196,10 @@ void Display::render(void)
 	if (frames==0) frametime=SDL_GetTicks();
 	scroll=scroll+speed;
 	SDL_GL_MakeCurrent(win,glctx);
-	resetGL();
+
+        /* Clear the framebuffer */
+	glClearColor(0.0f,0.0f,0.0f,1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(sp);
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);
@@ -242,7 +236,6 @@ void Display::setSize(int w, int h)
 	height=h;
 	width=w;
 	SDL_SetWindowSize(win,w,h);
-	resetGL();
 }
 void Display::setTitle(const char * t)
 {

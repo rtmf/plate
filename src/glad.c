@@ -7952,6 +7952,6 @@ int gladLoadGLLoader(GLADloadproc load) {
 	load_GL_ARB_sparse_texture(load);
 	load_GL_ARB_sparse_buffer(load);
 	load_GL_EXT_draw_range_elements(load);
-	return GLVersion.major != 0 && GLVersion.minor != 0;
+	return GLVersion.major != 0 || GLVersion.minor != 0;
 }
 

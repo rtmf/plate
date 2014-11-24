@@ -31,18 +31,6 @@ namespace PLATE
 			GLuint ttexID;
 			Vec2 p;
 			Vec2 s;
-                        /* A buffer to hold all vertex attributes */
-                        struct Vertex
-                        {
-                          float x, y, s, t;
-                          Vertex(float x, float y, float s, float t) :
-                            x(x), y(y), s(s), t(t)
-                          {}
-                          Vertex(){}
-                        };
-                        Vertex * verts;
-                        /* A vertex buffer object for the same! */
-                        GLuint vbo;
 	};
 };
 #endif //__TILELAYER_H__

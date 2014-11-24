@@ -49,17 +49,8 @@ namespace PLATE
 
 			float viewportSize[2];
 
-			GLuint vbo;
-			float verts[24]={
-            //x  y  u  v
-             0,  1, 0, 1,
-             1,  1, 1, 1,
-             1,  0, 1, 0,
-
-             0,  1, 0, 1,
-             1,  0, 1, 0,
-             0,  0, 0, 0
-			};
+			static void staticGLInitialization();
+			static GLuint vbo;
 	};
 };
 #endif //__DISPLAY_H__
