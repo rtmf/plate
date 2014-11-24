@@ -11,8 +11,6 @@ TileLayer::TileLayer(Tileset * tiles, int width, int height, Vec2 parallax, Vec2
 	s=scale;
 	tmap=new int[w*h]();
 	ttex=new unsigned char[w*h*4]; 
-	verts = new Vertex[w*h*4];
-	glGenBuffers(1, &vbo);
 	glGenTextures(1,&ttexID);
 	inverseTileTextureSize[0]=1.0f/(float)w;
 	inverseTileTextureSize[1]=1.0f/(float)h;
@@ -49,29 +47,24 @@ void TileLayer::refreshTiles()
 	}
 	/* First we must construct our vertex data */
 	float texCoords[4];
-	Vertex *vert = &verts[0];
 	for (int y=0; y<h; y++)
 	{
 		for (int x=0; x<w; x++)
 		{
-			tt->getTileTexCoords(getTile(x, y), &texCoords[0]);
-			vert[0] = Vertex(x,   y,   texCoords[0], texCoords[2]);
-			vert[1] = Vertex(x+1, y,   texCoords[1], texCoords[2]);
-			vert[2] = Vertex(x+1, y+1, texCoords[1], texCoords[3]);
-			vert[3] = Vertex(x,   y+1, texCoords[0], texCoords[3]);
-			vert += 4;
+			int tile = getTile(x, y);
 			int tpx,tpy;
-			tt->getTileCoords(getTile(x,y),&tpx,&tpy);
+			tt->getTileCoords(tile,&tpx,&tpy);
+			printf("tile coords: %d = (%d, %d)\n", tpx, tpy);
 			ttex[(x+y*w)*4]=tpx;
 			ttex[(x+y*w)*4+1]=tpy;
+			ttex[(x+y*w)*4+2]=255; // XXX move or change #channels in texture
+			ttex[(x+y*w)*4+3]=255;
 		}
 	}
 
-	/* Send vertex data to GL */
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, w * h * sizeof(*verts) * 4, verts, GL_STATIC_DRAW);
-
+	/* Upload tilemap data to texture */
 	glBindTexture(GL_TEXTURE_2D,ttexID);
+	/* TODO set tex params at constructor or something, not repeatedly */
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -121,7 +114,6 @@ void TileLayer::render(Display * d, Vec2 scroll)
 TileLayer::~TileLayer()
 {
 	glDeleteTextures(1,&ttexID);
-	glDeleteBuffers(1, &vbo);
 	delete tmap;
 	delete ttex;
 }
