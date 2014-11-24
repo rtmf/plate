@@ -123,6 +123,7 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	
 
 	SDL_SetWindowTitle(win,t);
+	glGenBuffers(1, &vbo);
 	resetGL();
         tl->refreshTiles();
         tl2->refreshTiles();
@@ -147,7 +148,6 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	spuTiles=glGetUniformLocation(sp,"tiles");
 	spuViewOffset=glGetUniformLocation(sp,"viewOffset");
 	spuInverseTileTextureSize=glGetUniformLocation(sp,"inverseTileTextureSize");
-	glGenBuffers(1,&vbo);
 }
 Plate * Display::getPlate(void)
 {
