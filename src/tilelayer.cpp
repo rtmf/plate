@@ -54,8 +54,7 @@ void TileLayer::refreshTiles()
 			int tile = getTile(x, y);
 			int tpx,tpy;
 			tt->getTileCoords(tile,&tpx,&tpy);
-			printf("tile coords: %d = (%d, %d)\n", tpx, tpy);
-			ttex[(x+y*w)*4]=tpx;
+			ttex[(x+y*w)*4+0]=tpx;
 			ttex[(x+y*w)*4+1]=tpy;
 			ttex[(x+y*w)*4+2]=255; // XXX move or change #channels in texture
 			ttex[(x+y*w)*4+3]=255;
