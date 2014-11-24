@@ -11,6 +11,7 @@ using namespace PLATE;
 	http://media.tojicode.com/webgl-samples/js/webgl-tilemap.js
 */
 const char * vertShader="\
+#version 130\n\
 precision mediump float;\
 \
 attribute vec2 position;\
@@ -32,6 +33,7 @@ void main(void)\
 }\
 ";
 const char * fragShader="\
+#version 130\n\
 precision mediump float;\
 \
 varying vec2 pixelCoord;\
@@ -82,7 +84,7 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	scroll=Vec2(0,0);
 	speed=Vec2(0,0);
 	
-	SDL_GL_SetSwapInterval(1);
+	SDL_GL_SetSwapInterval(0);
 
 	tex=new Texture(this,"marioishBG16x16.png");
 	ctset=new ColorTileset(16,16);
@@ -162,13 +164,13 @@ void Display::staticGLInitialization()
 	 */
 	float verts[24] = {
 	//   x   y  u  v
-		-1,  1, 0, 1,
-		 1,  1, 1, 1,
-		 1, -1, 1, 0,
+		-1, -1, 0, 1,
+		 1, -1, 1, 1,
+		 1,  1, 1, 0,
 
-		-1,  1, 0, 1,
-		 1, -1, 1, 0,
-		-1, -1, 0, 0
+		-1, -1, 0, 1,
+		 1,  1, 1, 0,
+		-1,  1, 0, 0
 	};
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
