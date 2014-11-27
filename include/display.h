@@ -1,6 +1,7 @@
 #ifndef __DISPLAY_H__
 #define __DISPLAY_H__
 #include "platecommon.h"
+#include "shader.h"
 namespace PLATE
 {
 	class Display
@@ -20,7 +21,7 @@ namespace PLATE
 			~Display(void);
 
 
-			GLuint vs,fs,sp;
+			ShaderProgram* shaderProgram;
 			GLuint spaPosition, spaTexture;
 			GLuint spuViewportSize,spuInverseSpriteTextureSize,spuTileSize,
 				spuInverseTileSize,spuSprites,spuTiles,spuViewOffset,
@@ -45,6 +46,13 @@ namespace PLATE
 			void resetGL(void);
 			void orthoGL(void);
 			void clearGL(void);
+
+			/* Queries all ShaderPrograms used by Display for their vertex attribute
+			 * and uniform locations, and assigns them to their corresponding member
+			 * variables. This should be done after shaders are loaded initially, or
+			 * after a call to ShaderProgram::rebuild().
+			 */
+			void getShaderVariableLocations();
 
 
 			float viewportSize[2];
