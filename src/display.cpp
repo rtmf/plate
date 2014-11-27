@@ -6,55 +6,6 @@
 #include "oglconsole.h"
 #include <random>
 using namespace PLATE;
-/*
-	These shaders are taken from
-	http://media.tojicode.com/webgl-samples/js/webgl-tilemap.js
-*/
-const char * vertShader="\
-#version 130\n\
-precision mediump float;\
-\
-attribute vec2 position;\
-attribute vec2 texture;\
-\
-varying vec2 pixelCoord;\
-varying vec2 texCoord;\
-\
-uniform vec2 viewOffset;\
-uniform vec2 viewportSize;\
-uniform vec2 inverseTileTextureSize;\
-uniform float inverseTileSize;\
-\
-void main(void)\
-{\
-	pixelCoord=(texture*viewportSize)+viewOffset;\
-	texCoord=pixelCoord*inverseTileTextureSize*inverseTileSize;\
-	gl_Position=vec4(position,0.0,1.0);\
-}\
-";
-const char * fragShader="\
-#version 130\n\
-precision mediump float;\
-\
-varying vec2 pixelCoord;\
-varying vec2 texCoord;\
-\
-uniform sampler2D tiles;\
-uniform sampler2D sprites;\
-\
-uniform vec2 inverseTileTextureSize;\
-uniform vec2 inverseSpriteTextureSize;\
-uniform float tileSize;\
-\
-void main(void)\
-{\
-	vec4 tile = texture2D(tiles,texCoord);\
-	if(tile.x==1.0&&tile.y==1.0) {discard;};\
-	vec2 spriteOffset=floor(tile.xy*256.0)*tileSize;\
-	vec2 spriteCoord=mod(pixelCoord,tileSize);\
-	gl_FragColor=texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);\
-}\
-";
 
 Display::Display(Plate * p, int w, int h, const char * t)
 {
@@ -135,26 +86,24 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	tl->refreshTiles();
 	tl2->refreshTiles();
 	OGLCONSOLE_Create();
-	vs=glCreateShader(GL_VERTEX_SHADER);
-	fs=glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(vs,1,&vertShader,NULL);
-	glShaderSource(fs,1,&fragShader,NULL);
-	glCompileShader(vs);
-	glCompileShader(fs);
-	sp=glCreateProgram();
-	glAttachShader(sp,vs);
-	glAttachShader(sp,fs);
-	glLinkProgram(sp);
-	spaPosition=glGetAttribLocation(sp,"position");
-	spaTexture=glGetAttribLocation(sp,"texture");
-	spuViewportSize=glGetUniformLocation(sp,"viewportSize");
-	spuInverseSpriteTextureSize=glGetUniformLocation(sp,"inverseSpriteTextureSize");
-	spuTileSize=glGetUniformLocation(sp,"tileSize");
-	spuInverseTileSize=glGetUniformLocation(sp,"inverseTileSize");
-	spuSprites=glGetUniformLocation(sp,"sprites");
-	spuTiles=glGetUniformLocation(sp,"tiles");
-	spuViewOffset=glGetUniformLocation(sp,"viewOffset");
-	spuInverseTileTextureSize=glGetUniformLocation(sp,"inverseTileTextureSize");
+
+    /* Load tojimap shaders */
+    shaderProgram = new ShaderProgram("shaders/vert-tojimap.glsl", "shaders/frag-tojimap.glsl");
+    /* Load shader program variable locations */
+    getShaderVariableLocations();
+}
+void Display::getShaderVariableLocations()
+{
+	spaPosition                 = shaderProgram->getAttribLocation("position");
+	spaTexture                  = shaderProgram->getAttribLocation("texture");
+	spuViewportSize             = shaderProgram->getUniformLocation("viewportSize");
+	spuInverseSpriteTextureSize = shaderProgram->getUniformLocation("inverseSpriteTextureSize");
+	spuTileSize                 = shaderProgram->getUniformLocation("tileSize");
+	spuInverseTileSize          = shaderProgram->getUniformLocation("inverseTileSize");
+	spuSprites                  = shaderProgram->getUniformLocation("sprites");
+	spuTiles                    = shaderProgram->getUniformLocation("tiles");
+	spuViewOffset               = shaderProgram->getUniformLocation("viewOffset");
+	spuInverseTileTextureSize   = shaderProgram->getUniformLocation("inverseTileTextureSize");
 }
 GLuint Display::vbo = 0;
 void Display::staticGLInitialization()
@@ -203,7 +152,7 @@ void Display::render(void)
 	glClearColor(0.0f,0.0f,0.0f,1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(sp);
+	shaderProgram->use();
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);
 	glEnableVertexAttribArray(spaPosition);
 	glEnableVertexAttribArray(spaTexture);
@@ -259,10 +208,10 @@ void Display::handleKey(SDL_KeyboardEvent k)
 		switch(k.keysym.scancode)
 		{
 			case SDL_SCANCODE_LEFT:
-				speed.x=1;
+				speed.x=-1;
 				break;
 			case SDL_SCANCODE_RIGHT:
-				speed.x=-1;
+				speed.x=1;
 				break;
 			case SDL_SCANCODE_UP:
 				speed.y=1;
