@@ -92,8 +92,8 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	staticGLInitialization();
 
 	/* Initialize viewPort size, sent to shader uniform of same name. */
-	viewportSize[0] = 640; // XXX don't hard-code
-	viewportSize[1] = 480; // XXX don't hard-code
+	viewportSize[0] = 512; // XXX don't hard-code
+	viewportSize[1] = 512; // XXX don't hard-code
 
 	tl->refreshTiles();
 	tl2->refreshTiles();
@@ -196,9 +196,9 @@ void Display::render(void)
 			31,1};
 	if (frames==50)
 	{
-	for (x=0;x<31;x++)
+	for (x=0;x<32;x++)
 	{
-		for (y=0;y<31;y++)
+		for (y=0;y<32;y++)
 		{
 			int count=0;
 			int i;
@@ -271,7 +271,7 @@ void Display::setTitle(const char * t)
 }
 void Display::handleKey(SDL_KeyboardEvent k)
 {
-	if (k.type==SDL_KEYUP)
+/*	if (k.type==SDL_KEYUP)
 	{
 		if (k.keysym.scancode==SDL_SCANCODE_LEFT ||
 			k.keysym.scancode==SDL_SCANCODE_RIGHT)
@@ -299,7 +299,7 @@ void Display::handleKey(SDL_KeyboardEvent k)
 			default:
 				break;
 		}
-	}
+	}*/
 }
 bool Display::GLok(const char* context, bool term_on_err)
 {

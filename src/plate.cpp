@@ -32,7 +32,7 @@ Plate::Plate(void)
 	textureSearchPath.push_back(std::string(".")+pathsep);
 
 
-	d = new Display(this,640,480,"PLATE Demo");
+	d = new Display(this,512,512,"PLATE Demo");
 	isRunning=true;
 }
 
