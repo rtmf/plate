@@ -7,6 +7,7 @@ plate_SOURCES = main.cpp \
 				tileset.cpp \
 				tilelayer.cpp \
 				texture.cpp \
+				shader.cpp \
 				glad.c \
 				oglconsole.c
 

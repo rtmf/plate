@@ -6,53 +6,6 @@
 #include "oglconsole.h"
 #include <random>
 using namespace PLATE;
-/*
-	These shaders are taken from
-	http://media.tojicode.com/webgl-samples/js/webgl-tilemap.js
-*/
-const char * vertShader="\
-precision mediump float;\
-\
-attribute vec2 position;\
-attribute vec2 texture;\
-\
-varying vec2 pixelCoord;\
-varying vec2 texCoord;\
-\
-uniform vec2 viewOffset;\
-uniform vec2 viewportSize;\
-uniform vec2 inverseTileTextureSize;\
-uniform float inverseTileSize;\
-\
-void main(void)\
-{\
-	pixelCoord=(texture*viewportSize)+viewOffset;\
-	texCoord=pixelCoord*inverseTileTextureSize*inverseTileSize;\
-	gl_Position=vec4(position,0.0,1.0);\
-}\
-";
-const char * fragShader="\
-precision mediump float;\
-\
-varying vec2 pixelCoord;\
-varying vec2 texCoord;\
-\
-uniform sampler2D tiles;\
-uniform sampler2D sprites;\
-\
-uniform vec2 inverseTileTextureSize;\
-uniform vec2 inverseSpriteTextureSize;\
-uniform float tileSize;\
-\
-void main(void)\
-{\
-	vec4 tile = texture2D(tiles,texCoord);\
-	if(tile.x==1.0&&tile.y==1.0) {discard;};\
-	vec2 spriteOffset=floor(tile.xy*256.0)*tileSize;\
-	vec2 spriteCoord=mod(pixelCoord,tileSize);\
-	gl_FragColor=texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);\
-}\
-";
 
 Display::Display(Plate * p, int w, int h, const char * t)
 {
@@ -82,7 +35,7 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	scroll=Vec2(0,0);
 	speed=Vec2(0,0);
 	
-	SDL_GL_SetSwapInterval(1);
+	SDL_GL_SetSwapInterval(0);
 
 	tex=new Texture(this,"marioishBG16x16.png");
 	ctset=new ColorTileset(16,16);
@@ -123,31 +76,55 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	
 
 	SDL_SetWindowTitle(win,t);
-	resetGL();
-        tl->refreshTiles();
-        tl2->refreshTiles();
+
+	staticGLInitialization();
+
+	/* Initialize viewPort size, sent to shader uniform of same name. */
+	viewportSize[0] = 640; // XXX don't hard-code
+	viewportSize[1] = 480; // XXX don't hard-code
+
+	tl->refreshTiles();
+	tl2->refreshTiles();
 	OGLCONSOLE_Create();
-	vs=glCreateShader(GL_VERTEX_SHADER);
-	fs=glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(vs,1,&vertShader,NULL);
-	glShaderSource(fs,1,&fragShader,NULL);
-	glCompileShader(vs);
-	glCompileShader(fs);
-	sp=glCreateProgram();
-	glAttachShader(sp,vs);
-	glAttachShader(sp,fs);
-	glLinkProgram(sp);
-	spaPosition=glGetAttribLocation(sp,"position");
-	spaTexture=glGetAttribLocation(sp,"texture");
-	spuViewportSize=glGetUniformLocation(sp,"viewportSize");
-	spuInverseSpriteTextureSize=glGetUniformLocation(sp,"inverseSpriteTextureSize");
-	spuTileSize=glGetUniformLocation(sp,"tileSize");
-	spuInverseTileSize=glGetUniformLocation(sp,"inverseTileSize");
-	spuSprites=glGetUniformLocation(sp,"sprites");
-	spuTiles=glGetUniformLocation(sp,"tiles");
-	spuViewOffset=glGetUniformLocation(sp,"viewOffset");
-	spuInverseTileTextureSize=glGetUniformLocation(sp,"inverseTileTextureSize");
-	glGenBuffers(1,&vbo);
+
+    /* Load tojimap shaders */
+    shaderProgram = new ShaderProgram("shaders/vert-tojimap.glsl", "shaders/frag-tojimap.glsl");
+    /* Load shader program variable locations */
+    getShaderVariableLocations();
+}
+void Display::getShaderVariableLocations()
+{
+	spaPosition                 = shaderProgram->getAttribLocation("position");
+	spaTexture                  = shaderProgram->getAttribLocation("texture");
+	spuViewportSize             = shaderProgram->getUniformLocation("viewportSize");
+	spuInverseSpriteTextureSize = shaderProgram->getUniformLocation("inverseSpriteTextureSize");
+	spuTileSize                 = shaderProgram->getUniformLocation("tileSize");
+	spuInverseTileSize          = shaderProgram->getUniformLocation("inverseTileSize");
+	spuSprites                  = shaderProgram->getUniformLocation("sprites");
+	spuTiles                    = shaderProgram->getUniformLocation("tiles");
+	spuViewOffset               = shaderProgram->getUniformLocation("viewOffset");
+	spuInverseTileTextureSize   = shaderProgram->getUniformLocation("inverseTileTextureSize");
+}
+GLuint Display::vbo = 0;
+void Display::staticGLInitialization()
+{
+	/* Create a vertex buffer with a single quad filling the entire viewable volume
+	 * in Normalized Device Coordinates, also spanning all of texture space as well.
+	 */
+	float verts[24] = {
+	//   x   y  u  v
+		-1, -1, 0, 1,
+		 1, -1, 1, 1,
+		 1,  1, 1, 0,
+
+		-1, -1, 0, 1,
+		 1,  1, 1, 0,
+		-1,  1, 0, 0
+	};
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 Plate * Display::getPlate(void)
 {
@@ -161,41 +138,6 @@ SDL_Renderer * Display::getRenderer(void)
 {
 	return rrr;
 }
-void Display::resetGL(void)
-{
-	int i;
-	for (i=0;i<6;i++)
-	{
-		verts[i*4]=width*verts[i*4+2];
-		verts[i*4+1]=height*verts[i*4+3];
-	}
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, 24, verts, GL_STATIC_DRAW);
-	SDL_GL_MakeCurrent(win,glctx);
-	orthoGL();
-	clearGL();
-}
-void Display::orthoGL(void)
-{
-	SDL_GL_MakeCurrent(win,glctx);
-
-	glViewport(0,0,width,height);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	glOrtho (0,width,height,0,-1,1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	clearGL();
-}
-void Display::clearGL(void)
-{
-	SDL_GL_MakeCurrent(win,glctx);
-	glClearColor(0.0f,0.0f,0.0f,0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-}
 void Display::render(void)
 {
 	float w,h;
@@ -205,9 +147,12 @@ void Display::render(void)
 	if (frames==0) frametime=SDL_GetTicks();
 	scroll=scroll+speed;
 	SDL_GL_MakeCurrent(win,glctx);
-	resetGL();
 
-	glUseProgram(sp);
+        /* Clear the framebuffer */
+	glClearColor(0.0f,0.0f,0.0f,1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	shaderProgram->use();
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);
 	glEnableVertexAttribArray(spaPosition);
 	glEnableVertexAttribArray(spaTexture);
@@ -245,7 +190,6 @@ void Display::setSize(int w, int h)
 	height=h;
 	width=w;
 	SDL_SetWindowSize(win,w,h);
-	resetGL();
 }
 void Display::setTitle(const char * t)
 {
@@ -267,10 +211,10 @@ void Display::handleKey(SDL_KeyboardEvent k)
 		switch(k.keysym.scancode)
 		{
 			case SDL_SCANCODE_LEFT:
-				speed.x=1;
+				speed.x=-1;
 				break;
 			case SDL_SCANCODE_RIGHT:
-				speed.x=-1;
+				speed.x=1;
 				break;
 			case SDL_SCANCODE_UP:
 				speed.y=1;
