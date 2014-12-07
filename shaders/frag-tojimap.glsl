@@ -1,6 +1,6 @@
-#version 130
+#version 120
 /* http://media.tojicode.com/webgl-samples/js/webgl-tilemap.js */
-precision mediump float;
+// this is not 120 compatible: precision mediump float;
 
 varying vec2 pixelCoord;
 varying vec2 texCoord;
