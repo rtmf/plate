@@ -7,15 +7,16 @@
 #include <random>
 using namespace PLATE;
 
-const int tileForState[]={30*32+8,31*32+11,31*32+12,31*32+1,30*32+14};
+const int tileForState[]={30*32+8,31*32+13,31*32+12,31*32+1,30*32+14,30*32+9};
 static int px=0,py=0;
 enum tileState
 {
 	TILE_STATE_ALIVE,
-	TILE_STATE_DEADLY,
 	TILE_STATE_SAFE,
+	TILE_STATE_SPAWNING,
 	TILE_STATE_EMPTY,
-	TILE_STATE_YOU
+	TILE_STATE_YOU,
+	TILE_STATE_DYING
 };
 
 Display::Display(Plate * p, int w, int h, const char * t)
@@ -213,15 +214,21 @@ void Display::render(void)
 				}
 				if (tl->getTile(x+32,y)==tileForState[TILE_STATE_EMPTY])
 				{
-					if (count==0)
-						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
-					else if (count<2 || count>3)
-						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
+					if (count==2)
+						tl->setTile(x,y,tileForState[TILE_STATE_SAFE]);
+					else if (count==3)
+						tl->setTile(x,y,tileForState[TILE_STATE_SPAWNING]);
 					else
-						tl->setTile(x,y,tileForState[TILE_STATE_SAFE]);	
+						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);	
 				}
 				else
-					tl->setTile(x,y,tileForState[TILE_STATE_ALIVE]);
+				{
+					if (count<2 || count>3)
+						tl->setTile(x,y,tileForState[TILE_STATE_DYING]);
+					else
+						tl->setTile(x,y,tileForState[TILE_STATE_ALIVE]);
+				}
+
 			}
 		}
 		if (tl->getTile((32+px+int(speed.x))%32,(32+py+int(speed.y))%32)!=tileForState[TILE_STATE_ALIVE])
@@ -243,9 +250,10 @@ void Display::render(void)
 				for (i=0;i<8;i++)
 				{
 					if(tl->getTile((x+ofs[i*2])%32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_ALIVE]) count++;
+					if(tl->getTile((x+ofs[i*2])%32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_DYING]) count++;
 					if(px==((x+ofs[i*2])%32) && py==((y+ofs[i*2+1])%32)) count++;
 				}
-				if (tl->getTile(x,y)==tileForState[0])
+				if (tl->getTile(x,y)==tileForState[TILE_STATE_ALIVE])
 				{
 					if (count<2 || count>3)
 						tl->setTile(x+32,y,tileForState[TILE_STATE_EMPTY]);
@@ -261,14 +269,16 @@ void Display::render(void)
 				}
 			}
 		}
+		if (tl->getTile(px+32,py)==tileForState[TILE_STATE_EMPTY])
+			std::cout<<"HURT!"<<std::endl;
+		else
+			std::cout<<"HEAL!"<<std::endl;
 		for (x=0;x<32;x++)
 		{
 			for (y=0;y<32;y++)
 			{
 				int count=0;
 				int i;
-				if (x==px && y==py && tl->getTile(x+32,y)==tileForState[TILE_STATE_EMPTY])
-					std::cout<<"DAMAGE!"<<std::endl;
 				for (i=0;i<8;i++)
 				{
 					if(tl->getTile((x+ofs[i*2])%32+32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_ALIVE]) count++;
@@ -276,15 +286,20 @@ void Display::render(void)
 				}
 				if (tl->getTile(x+32,y)==tileForState[TILE_STATE_EMPTY])
 				{
-					if (count==0)
-						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
-					else if (count<2 || count>3)
-						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
+					if (count==2)
+						tl->setTile(x,y,tileForState[TILE_STATE_SAFE]);
+					else if (count==3)
+						tl->setTile(x,y,tileForState[TILE_STATE_SPAWNING]);
 					else
-						tl->setTile(x,y,tileForState[TILE_STATE_SAFE]);	
+						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);	
 				}
 				else
-					tl->setTile(x,y,tileForState[TILE_STATE_ALIVE]);
+				{
+					if (count<2 || count>3)
+						tl->setTile(x,y,tileForState[TILE_STATE_DYING]);
+					else
+						tl->setTile(x,y,tileForState[TILE_STATE_ALIVE]);
+				}
 			}
 		}
 	}
