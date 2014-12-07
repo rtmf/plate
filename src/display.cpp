@@ -316,27 +316,49 @@ void Display::handleKey(SDL_KeyboardEvent k)
 {
 	if (k.type==SDL_KEYUP)
 	{
-		if (k.keysym.scancode==SDL_SCANCODE_LEFT ||
-			k.keysym.scancode==SDL_SCANCODE_RIGHT)
-			speed.x=0;
-		if (k.keysym.scancode==SDL_SCANCODE_UP ||
-			k.keysym.scancode==SDL_SCANCODE_DOWN)
-			speed.y=0;
+		switch(k.keysym.scancode)
+		{
+			case SDL_SCANCODE_LEFT:
+			case SDL_SCANCODE_RIGHT:
+			case SDL_SCANCODE_A:
+			case SDL_SCANCODE_D:
+				speed.x=0;
+				break;
+			case SDL_SCANCODE_UP:
+			case SDL_SCANCODE_DOWN:
+			case SDL_SCANCODE_W:
+			case SDL_SCANCODE_S:
+				speed.y=0;
+				break;
+			default:
+				break;
+		}
 	}
 	else
 	{
 		switch(k.keysym.scancode)
 		{
+			case SDL_SCANCODE_ESCAPE:
+				{
+					SDL_Event e;
+					e.type=SDL_QUIT;
+					SDL_PushEvent(&e);
+				}
+				break;
 			case SDL_SCANCODE_LEFT:
+			case SDL_SCANCODE_A:
 				speed.x=-1;
 				break;
 			case SDL_SCANCODE_RIGHT:
+			case SDL_SCANCODE_D:
 				speed.x=1;
 				break;
 			case SDL_SCANCODE_UP:
+			case SDL_SCANCODE_W:
 				speed.y=-1;
 				break;
 			case SDL_SCANCODE_DOWN:
+			case SDL_SCANCODE_S:
 				speed.y=1;
 				break;
 			default:
