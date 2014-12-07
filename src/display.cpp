@@ -7,6 +7,16 @@
 #include <random>
 using namespace PLATE;
 
+const int tileForState[]={30*32+8,31*32+11,31*32+12,31*32+1,31*32+10};
+enum tileState
+{
+	TILE_STATE_ALIVE,
+	TILE_STATE_DEADLY,
+	TILE_STATE_SAFE,
+	TILE_STATE_EMPTY,
+	TILE_STATE_YOU
+};
+
 Display::Display(Plate * p, int w, int h, const char * t)
 {
 	int x,y;
@@ -51,29 +61,31 @@ Display::Display(Plate * p, int w, int h, const char * t)
 
 	for (x=0;x<100;x++)
 	{
-		tl->setTile(x,0,0);
 		tl2->setTile(x,0,0);
-		tl->setTile(x,1,1);
 		tl2->setTile(x,1,1);
-		tl->setTile(x,2,2);
 		tl2->setTile(x,2,2);
-		tl->setTile(x,3,3);
 		tl2->setTile(x,3,3);
-		tl->setTile(x,4,4);
 		tl2->setTile(x,4,4);
 	}
 	std::default_random_engine generator;
-	std::uniform_int_distribution<int> tiledist(0,4);
-	std::uniform_int_distribution<int> tiledist2(0,(512/16)*(512/16)-1);
+	std::uniform_int_distribution<int> tiledist(0,1);
+	std::uniform_int_distribution<int> tiledist2(0,32*3);
 	for (y=5;y<100;y++)
 		for (x=0;x<100;x++)
 		{
 			int tile=tiledist2(generator);
-			tl->setTile(x,y,tile);
 //			tile=tiledist(generator);
 			tl2->setTile(x,y,tile);
 		}
 	
+
+	for (x=0;x<100;x++)
+	{
+		for (y=0;y<100;y++)
+		{
+			tl->setTile(x,y,tileForState[tiledist(generator)]);
+		}
+	}
 
 	SDL_SetWindowTitle(win,t);
 
@@ -152,6 +164,9 @@ void Display::render(void)
 	glClearColor(0.0f,0.0f,0.0f,1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
 	shaderProgram->use();
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);
 	glEnableVertexAttribArray(spaPosition);
@@ -159,8 +174,8 @@ void Display::render(void)
 	glVertexAttribPointer(spaPosition,2,GL_FLOAT,false,16,(void *)0);
 	glVertexAttribPointer(spaTexture,2,GL_FLOAT,false,16,(void *)8);
 	glUniform2fv(spuViewportSize,1,viewportSize);
-	tl2->makeCurrent(this,scroll);
-	glDrawArrays(GL_TRIANGLES,0,6);
+	//tl2->makeCurrent(this,scroll);
+	//glDrawArrays(GL_TRIANGLES,0,6);
 	tl->makeCurrent(this,scroll);
 	glDrawArrays(GL_TRIANGLES,0,6);
 	glActiveTexture(GL_TEXTURE1);
@@ -170,6 +185,68 @@ void Display::render(void)
 	glUseProgram(0);
 
 
+	int x,y;
+	int ofs[]={	1,0,
+			1,1,
+			0,1,
+			31,0,
+			0,31,
+			31,31,
+			1,31,
+			31,1};
+	if (frames==50)
+	{
+	for (x=0;x<31;x++)
+	{
+		for (y=0;y<31;y++)
+		{
+			int count=0;
+			int i;
+			for (i=0;i<8;i++)
+			{
+				if(tl->getTile((x+ofs[i*2])%32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_ALIVE]) count++;
+			}
+			if (tl->getTile(x,y)==tileForState[0])
+			{
+				if (count<2 || count>3)
+					tl->setTile(x+32,y,tileForState[TILE_STATE_EMPTY]);
+				else
+					tl->setTile(x+32,y,tileForState[TILE_STATE_ALIVE]);
+			}
+			else
+			{
+				if (count==3)
+					tl->setTile(x+32,y,tileForState[TILE_STATE_ALIVE]);
+				else
+					tl->setTile(x+32,y,tileForState[TILE_STATE_EMPTY]);
+			}
+		}
+	}
+	for (x=0;x<32;x++)
+	{
+		for (y=0;y<32;y++)
+		{
+			int count=0;
+			int i;
+			for (i=0;i<8;i++)
+			{
+				if(tl->getTile((x+ofs[i*2])%32+32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_ALIVE]) count++;
+			}
+			if (tl->getTile(x+32,y)==tileForState[TILE_STATE_EMPTY])
+			{
+				if (count==0)
+					tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
+				else if (count<2 || count>3)
+					tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
+				else
+					tl->setTile(x,y,tileForState[TILE_STATE_SAFE]);	
+			}
+			else
+				tl->setTile(x,y,tileForState[TILE_STATE_ALIVE]);
+		}
+	}
+	tl->refreshTiles();
+	}
 	//tl2->render(this,scroll);
 	//tl->render(this,scroll);
 	OGLCONSOLE_Draw();
