@@ -214,6 +214,9 @@ void Display::render(void)
 	glVertexAttribPointer(spaPosition,2,GL_FLOAT,false,16,(void *)0);
 	glVertexAttribPointer(spaTexture,2,GL_FLOAT,false,16,(void *)8);
 	glUniform2fv(spuViewportSize,1,viewportSize);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(1.0,1.0,1.0,1.0);
 	tl2->makeCurrent(this,scroll);
 	glDrawArrays(GL_TRIANGLES,0,6);
 	tl->makeCurrent(this,scroll);
