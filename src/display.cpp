@@ -291,10 +291,10 @@ void Display::handleKey(SDL_KeyboardEvent k)
 				speed.x=1;
 				break;
 			case SDL_SCANCODE_UP:
-				speed.y=1;
+				speed.y=-1;
 				break;
 			case SDL_SCANCODE_DOWN:
-				speed.y=-1;
+				speed.y=1;
 				break;
 			default:
 				break;
