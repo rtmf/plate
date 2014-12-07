@@ -7,7 +7,8 @@
 #include <random>
 using namespace PLATE;
 
-const int tileForState[]={30*32+8,31*32+11,31*32+12,31*32+1,31*32+10};
+const int tileForState[]={30*32+8,31*32+11,31*32+12,31*32+1,30*32+14};
+static int px=0,py=0;
 enum tileState
 {
 	TILE_STATE_ALIVE,
@@ -158,7 +159,7 @@ void Display::render(void)
 	static Uint32 frametime;
 	float fps;
 	if (frames==0) frametime=SDL_GetTicks();
-	scroll=scroll+speed;
+	//scroll=scroll+speed;
 	SDL_GL_MakeCurrent(win,glctx);
 
         /* Clear the framebuffer */
@@ -186,6 +187,7 @@ void Display::render(void)
 	glUseProgram(0);
 
 
+	//XXX LIFE CODE.  THIS CODE SHOULD NOT BE.
 	int x,y;
 	int ofs[]={	1,0,
 			1,1,
@@ -196,61 +198,98 @@ void Display::render(void)
 			1,31,
 			31,1};
 	if (frames==50)
+	{
 		liframe++;
+		for (x=0;x<32;x++)
+		{
+			for (y=0;y<32;y++)
+			{
+				int count=0;
+				int i;
+				for (i=0;i<8;i++)
+				{
+					if(tl->getTile((x+ofs[i*2])%32+32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_ALIVE]) count++;
+					if(px==((x+ofs[i*2])%32) && py==((y+ofs[i*2+1])%32)) count++;
+				}
+				if (tl->getTile(x+32,y)==tileForState[TILE_STATE_EMPTY])
+				{
+					if (count==0)
+						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
+					else if (count<2 || count>3)
+						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
+					else
+						tl->setTile(x,y,tileForState[TILE_STATE_SAFE]);	
+				}
+				else
+					tl->setTile(x,y,tileForState[TILE_STATE_ALIVE]);
+			}
+		}
+		if (tl->getTile((32+px+int(speed.x))%32,(32+py+int(speed.y))%32)!=tileForState[TILE_STATE_ALIVE])
+		{
+			px=(32+px+int(speed.x))%32;
+			py=(32+py+int(speed.y))%32;
+		}
+	}
 	if (liframe>=100)
 	{
 		liframe=0;
-	for (x=0;x<32;x++)
-	{
-		for (y=0;y<32;y++)
+		tl->setTile(px,py,tileForState[TILE_STATE_ALIVE]);
+		for (x=0;x<32;x++)
 		{
-			int count=0;
-			int i;
-			for (i=0;i<8;i++)
+			for (y=0;y<32;y++)
 			{
-				if(tl->getTile((x+ofs[i*2])%32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_ALIVE]) count++;
-			}
-			if (tl->getTile(x,y)==tileForState[0])
-			{
-				if (count<2 || count>3)
-					tl->setTile(x+32,y,tileForState[TILE_STATE_EMPTY]);
+				int count=0;
+				int i;
+				for (i=0;i<8;i++)
+				{
+					if(tl->getTile((x+ofs[i*2])%32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_ALIVE]) count++;
+					if(px==((x+ofs[i*2])%32) && py==((y+ofs[i*2+1])%32)) count++;
+				}
+				if (tl->getTile(x,y)==tileForState[0])
+				{
+					if (count<2 || count>3)
+						tl->setTile(x+32,y,tileForState[TILE_STATE_EMPTY]);
+					else
+						tl->setTile(x+32,y,tileForState[TILE_STATE_ALIVE]);
+				}
 				else
-					tl->setTile(x+32,y,tileForState[TILE_STATE_ALIVE]);
+				{
+					if (count==3)
+						tl->setTile(x+32,y,tileForState[TILE_STATE_ALIVE]);
+					else
+						tl->setTile(x+32,y,tileForState[TILE_STATE_EMPTY]);
+				}
 			}
-			else
+		}
+		for (x=0;x<32;x++)
+		{
+			for (y=0;y<32;y++)
 			{
-				if (count==3)
-					tl->setTile(x+32,y,tileForState[TILE_STATE_ALIVE]);
+				int count=0;
+				int i;
+				if (x==px && y==py && tl->getTile(x+32,y)==tileForState[TILE_STATE_EMPTY])
+					std::cout<<"DAMAGE!"<<std::endl;
+				for (i=0;i<8;i++)
+				{
+					if(tl->getTile((x+ofs[i*2])%32+32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_ALIVE]) count++;
+					if(px==((x+ofs[i*2])%32) && py==((y+ofs[i*2+1])%32)) count++;
+				}
+				if (tl->getTile(x+32,y)==tileForState[TILE_STATE_EMPTY])
+				{
+					if (count==0)
+						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
+					else if (count<2 || count>3)
+						tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
+					else
+						tl->setTile(x,y,tileForState[TILE_STATE_SAFE]);	
+				}
 				else
-					tl->setTile(x+32,y,tileForState[TILE_STATE_EMPTY]);
+					tl->setTile(x,y,tileForState[TILE_STATE_ALIVE]);
 			}
 		}
 	}
-	for (x=0;x<32;x++)
-	{
-		for (y=0;y<32;y++)
-		{
-			int count=0;
-			int i;
-			for (i=0;i<8;i++)
-			{
-				if(tl->getTile((x+ofs[i*2])%32+32,(y+ofs[i*2+1])%32)==tileForState[TILE_STATE_ALIVE]) count++;
-			}
-			if (tl->getTile(x+32,y)==tileForState[TILE_STATE_EMPTY])
-			{
-				if (count==0)
-					tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
-				else if (count<2 || count>3)
-					tl->setTile(x,y,tileForState[TILE_STATE_EMPTY]);
-				else
-					tl->setTile(x,y,tileForState[TILE_STATE_SAFE]);	
-			}
-			else
-				tl->setTile(x,y,tileForState[TILE_STATE_ALIVE]);
-		}
-	}
+	tl->setTile(px,py,tileForState[TILE_STATE_YOU]);
 	tl->refreshTiles();
-	}
 	//tl2->render(this,scroll);
 	//tl->render(this,scroll);
 	OGLCONSOLE_Draw();
@@ -259,7 +298,7 @@ void Display::render(void)
 	if (frames==100) {
 		frames=0;
 		fps=100.0f/((float)(SDL_GetTicks()-frametime)/1000.0f);
-		std::cout<<"FPS:"<<fps<<std::endl;
+//		std::cout<<"FPS:"<<fps<<std::endl;
 	}
 }
 void Display::setSize(int w, int h)
@@ -275,7 +314,7 @@ void Display::setTitle(const char * t)
 }
 void Display::handleKey(SDL_KeyboardEvent k)
 {
-/*	if (k.type==SDL_KEYUP)
+	if (k.type==SDL_KEYUP)
 	{
 		if (k.keysym.scancode==SDL_SCANCODE_LEFT ||
 			k.keysym.scancode==SDL_SCANCODE_RIGHT)
@@ -303,7 +342,7 @@ void Display::handleKey(SDL_KeyboardEvent k)
 			default:
 				break;
 		}
-	}*/
+	}
 }
 bool Display::GLok(const char* context, bool term_on_err)
 {
