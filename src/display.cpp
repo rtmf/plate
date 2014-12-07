@@ -50,7 +50,7 @@ Display::Display(Plate * p, int w, int h, const char * t)
 	tex=new Texture(this,"marioishBG16x16.png");
 	ctset=new ColorTileset(16,16);
 	ttset=new TextureTileset(tex,16,16);
-	tl=new TileLayer((Tileset *)ttset,100,100);
+	tl=new TileLayer((Tileset *)ttset,64,32);
 	tl2=new TileLayer((Tileset *)ttset,100,100,Vec2(-2,-2));
 
 	ctset->setTile(0,1.0,0.0,0.0,0.5);
@@ -79,11 +79,11 @@ Display::Display(Plate * p, int w, int h, const char * t)
 		}
 	
 
-	for (x=0;x<100;x++)
+	for (x=0;x<64;x++)
 	{
-		for (y=0;y<100;y++)
+		for (y=0;y<32;y++)
 		{
-			tl->setTile(x,y,tileForState[tiledist(generator)]);
+			tl->setTile(x,y,tileForState[tiledist(generator)*TILE_STATE_EMPTY]);
 		}
 	}
 
@@ -154,6 +154,7 @@ void Display::render(void)
 {
 	float w,h;
 	static int frames=0;
+	static int liframe=0;
 	static Uint32 frametime;
 	float fps;
 	if (frames==0) frametime=SDL_GetTicks();
@@ -195,7 +196,10 @@ void Display::render(void)
 			1,31,
 			31,1};
 	if (frames==50)
+		liframe++;
+	if (liframe>=100)
 	{
+		liframe=0;
 	for (x=0;x<32;x++)
 	{
 		for (y=0;y<32;y++)
